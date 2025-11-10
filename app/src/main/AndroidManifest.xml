@@ -22,11 +22,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".ui.main.BaoCaoThuChiActivity" />
 
         <!-- Register -->
         <activity
             android:name=".ui.auth.RegisterActivity"
             android:exported="false" />
+        <activity android:name=".ui.main.DanhSachGiaoDichActivity" />
+
 
         <!-- Main -->
         <activity
