@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.nhom3.personalfinance">
+
+    <!-- Quyền (nếu cần, ví dụ truy cập Internet hoặc SQLite thì không cần) -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="PersonalFinance"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.PersonalFinance">
+
+        <!-- Activity khởi đầu -->
+        <activity
+            android:name=".ui.auth.LoginActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Register -->
+        <activity
+            android:name=".ui.auth.RegisterActivity"
+            android:exported="false" />
+
+        <!-- Main -->
+        <activity
+            android:name=".ui.main.MainActivity"
+            android:exported="false" />
+
+        <!-- Các activity khác có thể khai báo thêm sau -->
+    </application>
+
+</manifest>
