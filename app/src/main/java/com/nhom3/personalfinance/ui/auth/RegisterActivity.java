@@ -10,11 +10,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.nhom3.personalfinance.R;
-import com.nhom3.personalfinance.viewmodel.AuthViewModel;
+import com.nhom3.personalfinance.data.db.AppDatabase;
+import com.nhom3.personalfinance.data.db.dao.UserDao;
+
+// 🔥 THAY THẾ: Import RegisterViewModel và Factory
+import com.nhom3.personalfinance.viewmodel.RegisterViewModel;
+import com.nhom3.personalfinance.viewmodel.RegisterViewModelFactory;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    private AuthViewModel viewModel;
+    private RegisterViewModel viewModel; // 🔥 ĐÃ SỬA: Dùng RegisterViewModel
     private EditText edtUsername;
     private EditText edtPassword;
     private Button btnRegister;
@@ -24,8 +29,11 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        // --- Khởi tạo ViewModel ---
-        viewModel = new ViewModelProvider(this).get(AuthViewModel.class);
+        // --- KHỞI TẠO REGISTER VIEWMODEL ---
+        UserDao userDao = AppDatabase.getDatabase(this).userDao();
+        RegisterViewModelFactory factory = new RegisterViewModelFactory(userDao); // 🔥 ĐÃ SỬA: Dùng Factory mới
+        viewModel = new ViewModelProvider(this, factory).get(RegisterViewModel.class); // 🔥 ĐÃ SỬA: Dùng ViewModel mới
+        // ----------------------------------------
 
         // --- Ánh xạ View ---
         edtUsername = findViewById(R.id.edtUsername);
@@ -34,6 +42,23 @@ public class RegisterActivity extends AppCompatActivity {
 
         // --- Sự kiện đăng ký ---
         btnRegister.setOnClickListener(v -> performRegister());
+
+        // --- QUAN SÁT TRẠNG THÁI ĐĂNG KÝ (LIVE DATA) ---
+        observeRegistrationStatus();
+    }
+
+    private void observeRegistrationStatus() {
+        // Lắng nghe thông báo kết quả đăng ký từ ViewModel
+        viewModel.getRegistrationMessage().observe(this, message -> {
+            if (message != null) {
+                Toast.makeText(RegisterActivity.this, message, Toast.LENGTH_LONG).show();
+
+                // Kiểm tra xem đăng ký có thành công không (giả định ViewModel trả về "Đăng ký thành công!")
+                if (message.contains("Đăng ký thành công")) {
+                    finish(); // Quay lại LoginActivity
+                }
+            }
+        });
     }
 
     // --- Hàm xử lý đăng ký ---
@@ -46,12 +71,7 @@ public class RegisterActivity extends AppCompatActivity {
             return;
         }
 
-        // Gọi ViewModel.register (chạy background thread)
-        viewModel.register(username, password, (success, message) -> runOnUiThread(() -> {
-            Toast.makeText(RegisterActivity.this, message, Toast.LENGTH_SHORT).show();
-            if (success) {
-                finish(); // trở về LoginActivity
-            }
-        }));
+        // 🔥 ĐÃ SỬA: Gọi phương thức register() của ViewModel, không dùng Callback
+        viewModel.register(username, password);
     }
 }

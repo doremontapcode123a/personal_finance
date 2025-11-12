@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/main"
+    android:background="@drawable/background"
+    tools:context=".ui.MainActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="32dp"
+        android:layout_gravity="center">
+
+        <Button
+            android:id="@+id/btnLoginMain"
+            android:layout_width="260dp"
+            android:layout_height="wrap_content"
+            android:text="Đăng nhập"
+            android:textAllCaps="false"
+            android:backgroundTint="#43A047"
+            android:textColor="@android:color/white"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="120dp"
+            android:elevation="6dp"
+            android:padding="10dp" />
+
+        <Button
+            android:id="@+id/btnSignupMain"
+            android:layout_width="260dp"
+            android:layout_height="wrap_content"
+            android:text="Đăng ký"
+            android:textAllCaps="false"
+            android:backgroundTint="#1B5E20"
+            android:textColor="@android:color/white"
+            android:elevation="6dp"
+            android:padding="10dp" />
+    </LinearLayout>
+</FrameLayout>

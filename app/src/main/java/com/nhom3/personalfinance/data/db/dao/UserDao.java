@@ -1,5 +1,6 @@
 package com.nhom3.personalfinance.data.db.dao;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -15,13 +16,20 @@ public interface UserDao {
     // --- Dùng cho chức năng Đăng ký ---
     // Thêm OnConflictStrategy.ABORT để tránh trùng username
     @Insert(onConflict = OnConflictStrategy.ABORT)
-    void insertUser(User user);
+    long insertUser(User user);
+
+
 
     // --- Dùng cho chức năng Đăng nhập ---
     @Query("SELECT * FROM USER WHERE username = :username AND password = :password LIMIT 1")
     User getUserByUsernameAndPassword(String username, String password);
     @Query("SELECT * FROM USER WHERE username = :username LIMIT 1")
     User getUserByUsername(String username);
+
+    @Query("SELECT * FROM USER WHERE id = :userId LIMIT 1")
+    LiveData<User> getUserById(int userId);
+
+
 
 
     // --- Dùng cho chức năng Đổi mật khẩu ---

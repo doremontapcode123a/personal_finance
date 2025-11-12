@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.nhom3.personalfinance">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- Quyền (nếu cần, ví dụ truy cập Internet hoặc SQLite thì không cần) -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- báo quyền để nhận sự kiện NotificationReceiver -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:allowBackup="true"
@@ -14,14 +15,19 @@
         android:theme="@style/Theme.PersonalFinance">
 
         <!-- Activity khởi đầu -->
+
         <activity
-            android:name=".ui.auth.LoginActivity"
+            android:name=".ui.auth.WelcomeActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".ui.auth.LoginActivity"
+            android:exported="false"/>
         <activity android:name=".ui.main.BaoCaoThuChiActivity" />
 
         <!-- Register -->
@@ -30,6 +36,13 @@
             android:exported="false" />
         <activity android:name=".ui.main.DanhSachGiaoDichActivity" />
 
+        <!-- Register -->
+        <activity
+            android:name=".ui.account.ChangePasswordActivity"
+            android:exported="false" />
+
+
+
 
         <!-- Main -->
         <activity
@@ -37,6 +50,15 @@
             android:exported="false" />
 
         <!-- Các activity khác có thể khai báo thêm sau -->
+
+        <receiver
+            android:name=".notification.NotificationReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
