@@ -26,7 +26,7 @@ public class NotificationHelper {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_avt_24)
                 .setContentTitle("Nhắc nhở nhập liệu 📝")
-                .setContentText("Đã đến 22h, đừng quên nhập giao dịch hôm nay!")
+                .setContentText("Đừng quên nhập giao dịch hôm nay!")
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setAutoCancel(true);
 
