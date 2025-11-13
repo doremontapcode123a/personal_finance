@@ -33,4 +33,6 @@ public interface WalletDao {
     // --- Lấy ví theo ID ---
     @Query("SELECT * FROM WALLET WHERE id = :walletId LIMIT 1")
     Wallet getWalletById(int walletId);
+    @Query("SELECT * FROM WALLET WHERE USERid = :userId ORDER BY id ASC")
+    List<Wallet> getWalletsByUserId(int userId);
 }

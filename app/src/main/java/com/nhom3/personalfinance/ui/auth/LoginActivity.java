@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+import android.content.SharedPreferences; // <-- IMPORT MỚI
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
@@ -28,14 +29,24 @@ public class LoginActivity extends AppCompatActivity {
         Button btnLogin = findViewById(R.id.btnLogin);
         Button btnRegister = findViewById(R.id.btnGoRegister);
 
+        // ... (bên trong LoginActivity.java)
         btnLogin.setOnClickListener(v -> {
             String username = edtUser.getText().toString().trim();
             String password = edtPass.getText().toString().trim();
 
-            viewModel.login(username, password, (success, message) -> {
+            // SỬA LẠI CALLBACK
+            viewModel.login(username, password, (user, message) -> { // "user" thay vì "success"
                 runOnUiThread(() -> {
                     Toast.makeText(LoginActivity.this, message, Toast.LENGTH_SHORT).show();
-                    if (success) {
+                    if (user != null) { // Kiểm tra user != null
+
+                        SharedPreferences prefs = getSharedPreferences("AppPrefs", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = prefs.edit();
+                        // LƯU CẢ 2: ID và USERNAME
+                        editor.putInt("LOGGED_IN_USER_ID", user.id);
+                        editor.putString("LOGGED_IN_USER", user.username);
+                        editor.apply();
+
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                         startActivity(intent);
                         finish();

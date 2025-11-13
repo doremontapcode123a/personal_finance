@@ -29,10 +29,19 @@ public interface TransactionDao {
     void deleteTransaction(Transaction transaction);
 
     // --- Lấy giao dịch trong khoảng thời gian (Thống kê) ---
-    @Query("SELECT * FROM `TRANSACTION` WHERE date BETWEEN :startDate AND :endDate ORDER BY date DESC")
-    List<Transaction> getTransactionsBetweenDates(Date startDate, Date endDate);
+    // --- SỬA HÀM NÀY ---
+    @Query("SELECT * FROM `TRANSACTION` WHERE date BETWEEN :startDate AND :endDate AND USERid = :userId ORDER BY date DESC")
+    List<Transaction> getTransactionsBetweenDates(Date startDate, Date endDate, int userId); // <-- THÊM , int userId
 
-    // --- Lấy toàn bộ giao dịch ---
-    @Query("SELECT * FROM `TRANSACTION` ORDER BY date DESC")
-    List<Transaction> getAllTransactions();
+    // --- SỬA HÀM NÀY ---
+    @Query("SELECT * FROM `TRANSACTION` WHERE USERid = :userId ORDER BY date DESC")
+    List<Transaction> getAllTransactions(int userId); // <-- THÊM int userId
+
+    // --- SỬA HÀM NÀY ---
+    @Query("SELECT * FROM `TRANSACTION` WHERE date BETWEEN :startDate AND :endDate AND amount >= 0 AND USERid = :userId ORDER BY date DESC")
+    List<Transaction> getIncomeTransactionsBetweenDates(Date startDate, Date endDate, int userId); // <-- THÊM , int userId
+
+    // --- SỬA HÀM NÀY ---
+    @Query("SELECT * FROM `TRANSACTION` WHERE date BETWEEN :startDate AND :endDate AND amount < 0 AND USERid = :userId ORDER BY date DESC")
+    List<Transaction> getExpenseTransactionsBetweenDates(Date startDate, Date endDate, int userId); // <-- THÊM , int userId
 }

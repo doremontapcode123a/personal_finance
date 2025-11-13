@@ -46,12 +46,15 @@ public class RegisterActivity extends AppCompatActivity {
             return;
         }
 
-        // Gọi ViewModel.register (chạy background thread)
-        viewModel.register(username, password, (success, message) -> runOnUiThread(() -> {
-            Toast.makeText(RegisterActivity.this, message, Toast.LENGTH_SHORT).show();
-            if (success) {
-                finish(); // trở về LoginActivity
-            }
-        }));
+        // SỬA LỖI Ở ĐÂY
+        // SỬA LỖI Ở ĐÂY
+        viewModel.register(username, password, (user, message) -> { // Đổi "success" thành "user"
+            runOnUiThread(() -> {
+                Toast.makeText(RegisterActivity.this, message, Toast.LENGTH_SHORT).show();
+                if (user != null) { // Đổi "if (success)" thành "if (user != null)"
+                    finish(); // Quay lại Login
+                }
+            });
+        });
     }
 }

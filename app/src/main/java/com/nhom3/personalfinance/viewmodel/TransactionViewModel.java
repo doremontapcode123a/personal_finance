@@ -1,10 +1,13 @@
 package com.nhom3.personalfinance.viewmodel;
 
 import android.app.Application;
+import android.content.Context;
+import android.content.SharedPreferences;
+
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData; // <-- IMPORT MỚI
+import androidx.lifecycle.MutableLiveData;
 
 import com.nhom3.personalfinance.data.db.AppDatabase;
 import com.nhom3.personalfinance.data.db.dao.CategoryDao;
@@ -14,6 +17,8 @@ import com.nhom3.personalfinance.data.model.SubCategory;
 import com.nhom3.personalfinance.data.model.Transaction;
 import com.nhom3.personalfinance.data.model.Wallet;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -25,11 +30,17 @@ public class TransactionViewModel extends AndroidViewModel {
     private CategoryDao categoryDao;
     private ExecutorService executorService;
 
-    // SỬA: Dùng MutableLiveData vì DAO của bạn không trả về LiveData
     private MutableLiveData<List<Wallet>> allWallets = new MutableLiveData<>();
     private MutableLiveData<List<SubCategory>> incomeCategories = new MutableLiveData<>();
     private MutableLiveData<List<SubCategory>> expenseCategories = new MutableLiveData<>();
-    private MutableLiveData<List<Transaction>> allTransactions = new MutableLiveData<>();
+    private MutableLiveData<List<Transaction>> filteredTransactions = new MutableLiveData<>();
+    private MutableLiveData<Double> totalBalance = new MutableLiveData<>();
+
+    private String currentDateFilter = "this_month";
+    private String currentTypeFilter = "all";
+    private Date customStartDate;
+    private Date customEndDate;
+    private int currentUserId;
 
     public TransactionViewModel(@NonNull Application application) {
         super(application);
@@ -39,76 +50,138 @@ public class TransactionViewModel extends AndroidViewModel {
         categoryDao = database.categoryDao();
         executorService = Executors.newSingleThreadExecutor();
 
-        // Tải dữ liệu ban đầu cho các Spinner
+        SharedPreferences prefs = application.getSharedPreferences("AppPrefs", Context.MODE_PRIVATE);
+        currentUserId = prefs.getInt("LOGGED_IN_USER_ID", -1);
+
         loadInitialData();
-        loadAllTransactions();
+        refreshData();
     }
 
-    // HÀM MỚI: Tải dữ liệu từ DAO (không phải LiveData)
     private void loadInitialData() {
         executorService.execute(() -> {
-            // 1. Lấy ví (Dùng hàm getAllWallets)
-            List<Wallet> wallets = walletDao.getAllWallets();
+            List<Wallet> wallets = walletDao.getWalletsByUserId(currentUserId);
             allWallets.postValue(wallets);
 
-            // 2. Lấy danh mục Thu (Dùng hàm getSubCategoriesByCategoryId)
-            List<SubCategory> incomes = categoryDao.getSubCategoriesByCategoryId(1); // 1 = ID của "Thu"
+            List<SubCategory> incomes = categoryDao.getSubCategoriesByCategoryId(1, currentUserId);
             incomeCategories.postValue(incomes);
 
-            // 3. Lấy danh mục Chi (Dùng hàm getSubCategoriesByCategoryId)
-            List<SubCategory> expenses = categoryDao.getSubCategoriesByCategoryId(2); // 2 = ID của "Chi"
+            List<SubCategory> expenses = categoryDao.getSubCategoriesByCategoryId(2, currentUserId);
             expenseCategories.postValue(expenses);
         });
     }
-    // --- HÀM MỚI ---
-    // Hàm này để tải tất cả giao dịch
-    public void loadAllTransactions() {
+
+    public void refreshData() {
+        loadFilteredTransactions();
+        recalculateTotalBalance();
+    }
+
+    private void recalculateTotalBalance() {
         executorService.execute(() -> {
-            List<Transaction> transactions = transactionDao.getAllTransactions();
-            allTransactions.postValue(transactions);
+            // SỬA LỖI: Chỉ lấy ví của user hiện tại để tính tổng
+            List<Wallet> wallets = walletDao.getWalletsByUserId(currentUserId);
+            double total = 0;
+            for (Wallet w : wallets) {
+                total += w.balance;
+            }
+            totalBalance.postValue(total);
         });
     }
 
-    // --- GETTER MỚI ---
-    public LiveData<List<Transaction>> getAllTransactions() {
-        return allTransactions;
-    }
-    // --- HẾT PHẦN MỚI ---
-    // --- Getters cho các Spinner (trả về LiveData) ---
-    public LiveData<List<Wallet>> getAllWallets() {
-        return allWallets;
+    public void loadFilteredTransactions() {
+        executorService.execute(() -> {
+            Calendar cal = Calendar.getInstance();
+            cal.set(Calendar.HOUR_OF_DAY, 0);
+            cal.clear(Calendar.MINUTE);
+            cal.clear(Calendar.SECOND);
+            cal.clear(Calendar.MILLISECOND);
+
+            Date startDate, endDate;
+
+            if ("this_month".equals(currentDateFilter)) {
+                cal.set(Calendar.DAY_OF_MONTH, 1);
+                startDate = cal.getTime();
+                cal.add(Calendar.MONTH, 1);
+                cal.add(Calendar.MILLISECOND, -1);
+                endDate = cal.getTime();
+            } else if ("last_month".equals(currentDateFilter)) {
+                cal.add(Calendar.MONTH, -1);
+                cal.set(Calendar.DAY_OF_MONTH, 1);
+                startDate = cal.getTime();
+                cal.add(Calendar.MONTH, 1);
+                cal.add(Calendar.MILLISECOND, -1);
+                endDate = cal.getTime();
+            } else {
+                if (customStartDate == null || customEndDate == null) {
+                    cal.set(Calendar.DAY_OF_MONTH, 1);
+                    startDate = cal.getTime();
+                    cal.add(Calendar.MONTH, 1);
+                    cal.add(Calendar.MILLISECOND, -1);
+                    endDate = cal.getTime();
+                } else {
+                    startDate = customStartDate;
+                    endDate = customEndDate;
+                }
+            }
+
+            List<Transaction> transactions;
+            if ("income".equals(currentTypeFilter)) {
+                transactions = transactionDao.getIncomeTransactionsBetweenDates(startDate, endDate, currentUserId);
+            } else if ("expense".equals(currentTypeFilter)) {
+                transactions = transactionDao.getExpenseTransactionsBetweenDates(startDate, endDate, currentUserId);
+            } else {
+                transactions = transactionDao.getTransactionsBetweenDates(startDate, endDate, currentUserId);
+            }
+
+            filteredTransactions.postValue(transactions);
+        });
     }
 
-    public LiveData<List<SubCategory>> getIncomeCategories() {
-        return incomeCategories;
+    public void setFilter(String dateFilter, String typeFilter) {
+        if (!"custom".equals(dateFilter)) {
+            this.currentDateFilter = dateFilter;
+        }
+        this.currentTypeFilter = typeFilter;
+        refreshData();
     }
 
-    public LiveData<List<SubCategory>> getExpenseCategories() {
-        return expenseCategories;
+    public void setCustomDateFilter(Date startDate, Date endDate) {
+        this.currentDateFilter = "custom";
+        this.customStartDate = startDate;
+        this.customEndDate = endDate;
     }
 
-    // --- SỬA: Hành động Insert (Dùng hàm insertTransaction và updateWallet) ---
+    public LiveData<List<Transaction>> getFilteredTransactions() { return filteredTransactions; }
+    public LiveData<Double> getTotalBalance() { return totalBalance; }
+    public LiveData<List<Wallet>> getAllWallets() { return allWallets; }
+    public LiveData<List<SubCategory>> getIncomeCategories() { return incomeCategories; }
+    public LiveData<List<SubCategory>> getExpenseCategories() { return expenseCategories; }
+
     public void insertTransaction(Transaction transaction, Wallet selectedWallet) {
         executorService.execute(() -> {
-            // 1. Thêm giao dịch (Dùng hàm insertTransaction)
+            transaction.USERid = currentUserId; // Gán User ID
             transactionDao.insertTransaction(transaction);
 
-            // 2. Cập nhật số dư ví (Dùng getWalletById và updateWallet)
-            // Lấy lại thông tin ví mới nhất từ CSDL
             Wallet walletToUpdate = walletDao.getWalletById(selectedWallet.id);
             if (walletToUpdate != null) {
-                // transaction.amount đã là (+) cho Thu và (-) cho Chi
                 double newBalance = walletToUpdate.balance + transaction.amount;
                 walletToUpdate.balance = newBalance;
-
-                // Cập nhật toàn bộ object Wallet
                 walletDao.updateWallet(walletToUpdate);
             }
-            // --- CẬP NHẬT MỚI ---
-            // Sau khi thêm, tải lại danh sách giao dịch
-            loadAllTransactions();
-            // --- HẾT CẬP NHẬT MỚI ---
+            refreshData();
         });
     }
 
+    public void deleteTransaction(Transaction transaction) {
+        executorService.execute(() -> {
+            transactionDao.deleteTransaction(transaction);
+
+            Wallet walletToUpdate = walletDao.getWalletById(transaction.WALLETid);
+            if (walletToUpdate != null) {
+                double newBalance = walletToUpdate.balance - transaction.amount;
+                walletToUpdate.balance = newBalance;
+                walletDao.updateWallet(walletToUpdate);
+            }
+            refreshData();
+        });
+    }
 }

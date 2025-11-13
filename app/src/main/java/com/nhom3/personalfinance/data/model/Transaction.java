@@ -54,7 +54,7 @@ public class Transaction {
     @ColumnInfo(name = "SUB_CATEGORYid")
     @Nullable
     public Integer SUB_CATEGORYid;
-
+    public int USERid; // <-- THÊM DÒNG NÀY
     // --- Constructor mặc định (Room yêu cầu) ---
     public Transaction() {
     }

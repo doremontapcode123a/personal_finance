@@ -40,6 +40,14 @@
         <activity
             android:name=".ui.transaction.AddEditTransactionActivity"
             android:exported="false" />
-
+        <activity
+            android:name=".ui.category.ManageCategoriesActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.account.ManageWalletsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.account.ChangePasswordActivity"
+            android:exported="false" />
     </application>
 </manifest>

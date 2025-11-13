@@ -27,6 +27,7 @@ public class SubCategory {
 
     @ColumnInfo(name = "CATEGORYid")
     public int CATEGORYid;
+    public int USERid;
 
     // --- Constructor mặc định (Room yêu cầu) ---
     public SubCategory() {

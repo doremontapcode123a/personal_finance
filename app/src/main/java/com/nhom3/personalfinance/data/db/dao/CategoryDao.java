@@ -32,8 +32,9 @@ public interface CategoryDao {
     void deleteSubCategory(SubCategory subCategory);
 
     // --- Lấy danh mục con theo loại ---
-    @Query("SELECT * FROM SUB_CATEGORY WHERE CATEGORYid = :categoryId ORDER BY id ASC")
-    List<SubCategory> getSubCategoriesByCategoryId(int categoryId);
+    // --- SỬA HÀM NÀY ---
+    @Query("SELECT * FROM SUB_CATEGORY WHERE CATEGORYid = :categoryId AND USERid = :userId ORDER BY id ASC")
+    List<SubCategory> getSubCategoriesByCategoryId(int categoryId, int userId); // <-- THÊM , int userId
 
     // --- Lấy toàn bộ danh mục cha (Thu, Chi) ---
     @Query("SELECT * FROM CATEGORY ORDER BY id ASC")

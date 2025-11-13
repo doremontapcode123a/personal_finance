@@ -12,7 +12,7 @@ public class Category {
 
     @NonNull
     public String name;
-
+    public int USERid; // <-- THÊM DÒNG NÀY
     // --- Constructor mặc định (Room yêu cầu) ---
     public Category() {
     }
