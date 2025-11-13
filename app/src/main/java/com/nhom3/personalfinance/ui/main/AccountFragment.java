@@ -48,7 +48,7 @@ public class AccountFragment extends Fragment {
         AccountViewModelFactory factory = new AccountViewModelFactory(userDao, currentUserId);
         viewModel = new ViewModelProvider(this, factory).get(AccountViewModel.class);
 
-        // ÁNH XẠ ID CHÍNH XÁC
+        // ÁNH XẠ
         TextView usernameTextView = view.findViewById(R.id.tvUsername);
         TextView changePasswordTextView = view.findViewById(R.id.tvChangePassword);
         TextView logoutTextView = view.findViewById(R.id.tvLogout);

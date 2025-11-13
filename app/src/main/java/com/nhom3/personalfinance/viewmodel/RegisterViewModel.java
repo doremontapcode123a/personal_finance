@@ -19,21 +19,23 @@ public class RegisterViewModel extends ViewModel {
     private final MutableLiveData<Boolean> isRegistrationComplete = new MutableLiveData<>();
 
     // Hằng số và Regex cho điều kiện kiểm tra mật khẩu
-    private static final int MIN_PASSWORD_LENGTH = 6; // Đã sửa về 8 ký tự
-    // Regex: Phải chứa ít nhất 1 chữ số, 1 chữ thường, 1 chữ hoa, 1 ký tự đặc biệt, và dài ít nhất 8 ký tự
+    private static final int MIN_PASSWORD_LENGTH = 6; // ✅ Giữ nguyên 6 ký tự
+    // Đã thay đổi: Biểu thức Regex mới chỉ cần kiểm tra tối thiểu 6 ký tự bất kỳ.
     private static final Pattern PASSWORD_PATTERN =
-            Pattern.compile("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=\\S+$).{6,}$");
+            Pattern.compile("^.{6,}$"); // ✅ Sửa Regex
 
 
     // Getters
     public LiveData<String> getRegistrationMessage() { return registrationMessage; }
+
+    public LiveData<Boolean> getIsRegistrationComplete() { return isRegistrationComplete; } // Thêm Getter này nếu chưa có
 
     public RegisterViewModel(UserDao userDao) {
         this.userDao = userDao;
     }
 
     /**
-     * Kiểm tra xem mật khẩu có đáp ứng các điều kiện bảo mật không.
+     * Kiểm tra xem mật khẩu có đáp ứng các điều kiện bảo mật không (chỉ cần tối thiểu 6 ký tự).
      */
     private boolean isValidPassword(String password) {
         if (password == null || password.isEmpty()) {
@@ -44,8 +46,9 @@ public class RegisterViewModel extends ViewModel {
             registrationMessage.postValue("Mật khẩu phải dài ít nhất " + MIN_PASSWORD_LENGTH + " ký tự.");
             return false;
         }
+        // ✅ Xóa điều kiện kiểm tra phức tạp và chỉ cần kiểm tra theo Regex mới
         if (!PASSWORD_PATTERN.matcher(password).matches()) {
-            registrationMessage.postValue("Mật khẩu phải chứa ít nhất 1 chữ hoa, 1 chữ thường, 1 số và 1 ký tự đặc biệt (@#$...).");
+            registrationMessage.postValue("Mật khẩu không hợp lệ."); // Thông báo chung, nhưng về cơ bản chỉ là kiểm tra độ dài
             return false;
         }
         return true;

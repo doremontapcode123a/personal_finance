@@ -21,8 +21,9 @@ public class AccountViewModel extends ViewModel {
     private final MutableLiveData<Boolean> navigateToWelcome = new MutableLiveData<>();
 
     private static final int MIN_PASSWORD_LENGTH = 6;
-    private static final Pattern PASSWORD_PATTERN =
-            Pattern.compile("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=\\S+$).{6,}$");
+    // Đã thay đổi: Biểu thức Regex mới chỉ cần kiểm tra tối thiểu 6 ký tự bất kỳ.
+    // "^.{6,}$" : Bắt đầu chuỗi, bất kỳ ký tự nào, lặp lại ít nhất 6 lần, kết thúc chuỗi.
+    private static final Pattern PASSWORD_PATTERN = Pattern.compile("^.{6,}$");
 
     // Getters
     public LiveData<String> getPasswordChangeMessage() { return passwordChangeMessage; }
@@ -48,9 +49,13 @@ public class AccountViewModel extends ViewModel {
             passwordChangeMessage.postValue("Mật khẩu phải dài ít nhất " + MIN_PASSWORD_LENGTH + " ký tự.");
             return false;
         }
+        // Chỉ cần kiểm tra độ dài tối thiểu 6 ký tự, không cần kiểm tra các yêu cầu phức tạp khác
         if (!PASSWORD_PATTERN.matcher(password).matches()) {
-            passwordChangeMessage.postValue("Mật khẩu phải chứa ít nhất 1 chữ hoa, 1 chữ thường, 1 số và 1 ký tự đặc biệt (@#$...).");
-            return false;
+            // Trường hợp này gần như không xảy ra do đã kiểm tra ở trên (password.length() < MIN_PASSWORD_LENGTH)
+            // nhưng giữ lại để tuân thủ logic. Thông báo này có thể xóa hoặc sửa thành thông báo chung.
+            // Nếu bạn muốn bỏ hẳn kiểm tra Regex phức tạp: có thể xóa khối if này.
+            // Tuy nhiên, với Regex đơn giản "^.{6,}$", nó vẫn đảm bảo độ dài.
+            return true;
         }
         return true;
     }
