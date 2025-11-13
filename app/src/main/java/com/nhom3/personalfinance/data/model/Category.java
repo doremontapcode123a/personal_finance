@@ -8,10 +8,10 @@ import androidx.room.PrimaryKey;
 public class Category {
 
     @PrimaryKey(autoGenerate = true)
-    private int id;
+    public int id;
 
     @NonNull
-    private String name;
+    public String name;
 
     // --- Constructor mặc định (Room yêu cầu) ---
     public Category() {

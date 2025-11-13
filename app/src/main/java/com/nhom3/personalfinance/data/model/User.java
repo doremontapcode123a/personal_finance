@@ -12,13 +12,13 @@ import androidx.annotation.NonNull;
 public class User {
 
     @PrimaryKey(autoGenerate = true)
-    private int id;
+    public int id;
 
     @NonNull
-    private String username;
+    public String username;
 
     @NonNull
-    private String password;
+    public String password;
 
     // --- Constructor mặc định (Room yêu cầu) ---
     public User() {

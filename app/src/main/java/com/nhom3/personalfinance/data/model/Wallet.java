@@ -20,15 +20,15 @@ import androidx.room.PrimaryKey;
 public class Wallet {
 
     @PrimaryKey(autoGenerate = true)
-    private int id;
+    public int id;
 
     @NonNull
-    private String name;
+    public String name;
 
-    private double balance;
+    public double balance;
 
     @ColumnInfo(name = "USERid")
-    private int USERid;
+    public int USERid;
 
     // --- Constructor mặc định (Room yêu cầu) ---
     public Wallet() {
@@ -75,15 +75,10 @@ public class Wallet {
         this.USERid = USERid;
     }
 
-    // --- toString() để debug ---
+    // ... bên trong class Wallet ...
     @Override
     public String toString() {
-        return "Wallet{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", balance=" + balance +
-                ", USERid=" + USERid +
-                '}';
+        return name; // Trả về tên của ví
     }
 }
 

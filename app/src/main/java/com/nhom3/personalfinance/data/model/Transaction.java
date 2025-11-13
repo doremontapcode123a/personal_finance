@@ -34,26 +34,26 @@ import java.util.Date;
 public class Transaction {
 
     @PrimaryKey(autoGenerate = true)
-    private int id;
+    public int id;
 
     @NonNull
-    private String name;
+    public String name;
 
-    private double amount;
+    public double amount;
 
     @Nullable
-    private String note;
+    public String note;
 
     @NonNull
-    private Date date;
+    public Date date;
 
     @ColumnInfo(name = "WALLETid")
     @Nullable
-    private Integer WALLETid;
+    public Integer WALLETid;
 
     @ColumnInfo(name = "SUB_CATEGORYid")
     @Nullable
-    private Integer SUB_CATEGORYid;
+    public Integer SUB_CATEGORYid;
 
     // --- Constructor mặc định (Room yêu cầu) ---
     public Transaction() {

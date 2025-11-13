@@ -19,12 +19,12 @@ import androidx.room.PrimaryKey;
 public class Budget {
 
     @PrimaryKey(autoGenerate = true)
-    private int id;
+    public int id;
 
-    private double budget;
+    public double budget;
 
     @ColumnInfo(name = "SUB_CATEGORYid")
-    private int SUB_CATEGORYid;
+    public int SUB_CATEGORYid;
 
     // --- Constructor mặc định (Room yêu cầu) ---
     public Budget() {
