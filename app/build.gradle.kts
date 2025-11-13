@@ -48,8 +48,8 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-livedata:2.6.2")
 
     // Các dependency khác
-    implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+//    implementation("androidx.appcompat:appcompat:1.6.1")
+//    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
     // Version catalog dependencies (nếu có)
     implementation(libs.appcompat)

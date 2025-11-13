@@ -21,6 +21,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".ui.main.BaoCaoThuChiActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.main.DanhSachGiaoDichActivity"
+            android:exported="false" />
+
 
         <activity
             android:name=".ui.auth.RegisterActivity"
