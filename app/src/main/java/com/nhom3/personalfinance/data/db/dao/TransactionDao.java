@@ -35,4 +35,23 @@ public interface TransactionDao {
     // --- Lấy toàn bộ giao dịch ---
     @Query("SELECT * FROM `TRANSACTION` ORDER BY date DESC")
     List<Transaction> getAllTransactions();
+    // ... (bên trong public interface TransactionDao)
+
+    // --- CÁC HÀM LỌC MỚI ---
+
+    // 1. Lấy tất cả (đã có)
+    // @Query("SELECT * FROM `TRANSACTION` ORDER BY date DESC")
+    // List<Transaction> getAllTransactions();
+
+    // 2. Lấy tất cả theo khoảng ngày (đã có)
+    // @Query("SELECT * FROM `TRANSACTION` WHERE date BETWEEN :startDate AND :endDate ORDER BY date DESC")
+    // List<Transaction> getTransactionsBetweenDates(Date startDate, Date endDate);
+
+    // 3. Lấy CHỈ KHOẢN THU (amount >= 0) theo ngày
+    @Query("SELECT * FROM `TRANSACTION` WHERE date BETWEEN :startDate AND :endDate AND amount >= 0 ORDER BY date DESC")
+    List<Transaction> getIncomeTransactionsBetweenDates(Date startDate, Date endDate);
+
+    // 4. Lấy CHỈ KHOẢN CHI (amount < 0) theo ngày
+    @Query("SELECT * FROM `TRANSACTION` WHERE date BETWEEN :startDate AND :endDate AND amount < 0 ORDER BY date DESC")
+    List<Transaction> getExpenseTransactionsBetweenDates(Date startDate, Date endDate);
 }

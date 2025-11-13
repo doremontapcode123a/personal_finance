@@ -21,6 +21,18 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
     private SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
     private NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
 
+    // --- INTERFACE CHO CLICK LISTENER ---
+    public interface OnItemClickListener {
+        void onItemClick(Transaction transaction);
+        void onItemLongClick(Transaction transaction);
+    }
+    private final OnItemClickListener listener;
+
+    // --- Sửa Hàm Constructor ---
+    public TransactionAdapter(OnItemClickListener listener) {
+        this.listener = listener;
+    }
+
     @NonNull
     @Override
     public TransactionViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -35,17 +47,21 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
 
         holder.name.setText(currentTransaction.name);
         holder.date.setText(dateFormat.format(currentTransaction.date));
-
-        // Format tiền tệ
         String formattedAmount = currencyFormat.format(currentTransaction.amount);
         holder.amount.setText(formattedAmount);
 
-        // Đổi màu
         if (currentTransaction.amount < 0) {
-            holder.amount.setTextColor(Color.RED); // Chi
+            holder.amount.setTextColor(Color.RED);
         } else {
-            holder.amount.setTextColor(Color.rgb(0, 150, 0)); // Thu (Xanh lá)
+            holder.amount.setTextColor(Color.rgb(0, 150, 0));
         }
+
+        // --- Thêm sự kiện Click và LongClick ---
+        holder.itemView.setOnClickListener(v -> listener.onItemClick(currentTransaction));
+        holder.itemView.setOnLongClickListener(v -> {
+            listener.onItemLongClick(currentTransaction);
+            return true;
+        });
     }
 
     @Override
@@ -53,13 +69,11 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         return transactions.size();
     }
 
-    // Hàm để ViewModel cập nhật danh sách
     public void setTransactions(List<Transaction> transactions) {
         this.transactions = transactions;
-        notifyDataSetChanged(); // Báo cho Adapter biết dữ liệu đã thay đổi
+        notifyDataSetChanged();
     }
 
-    // Lớp ViewHolder
     class TransactionViewHolder extends RecyclerView.ViewHolder {
         private TextView name;
         private TextView date;
