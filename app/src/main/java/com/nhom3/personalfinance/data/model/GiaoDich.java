@@ -1,9 +1,9 @@
 
 package com.nhom3.personalfinance.data.model;
 public class GiaoDich {
-    private String ten;
-    private String ngay;
-    private double soTien;
+    public String ten;
+    public String ngay;
+    public double soTien;
 
     public GiaoDich(String ten, String ngay, double soTien) {
         this.ten = ten;

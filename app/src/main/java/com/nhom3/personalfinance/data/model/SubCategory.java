@@ -20,13 +20,13 @@ import androidx.room.PrimaryKey;
 public class SubCategory {
 
     @PrimaryKey(autoGenerate = true)
-    private int id;
+    public int id;
 
     @NonNull
-    private String name;
+    public String name;
 
     @ColumnInfo(name = "CATEGORYid")
-    private int CATEGORYid;
+    public int CATEGORYid;
 
     // --- Constructor mặc định (Room yêu cầu) ---
     public SubCategory() {
@@ -64,13 +64,9 @@ public class SubCategory {
         this.CATEGORYid = CATEGORYid;
     }
 
-    // --- toString() để debug ---
+    // ... bên trong class SubCategory ...
     @Override
     public String toString() {
-        return "SubCategory{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", CATEGORYid=" + CATEGORYid +
-                '}';
+        return name; // Trả về tên của danh mục con
     }
 }
