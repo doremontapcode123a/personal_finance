@@ -2,71 +2,96 @@ package com.nhom3.personalfinance.ui.account;
 
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
-import android.content.Context; // <-- IMPORT MỚI
-import android.content.SharedPreferences; // <-- IMPORT MỚI
-
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-
-import com.google.android.material.textfield.TextInputEditText;
 import com.nhom3.personalfinance.R;
-import com.nhom3.personalfinance.viewmodel.AuthViewModel;
+import com.nhom3.personalfinance.data.db.AppDatabase;
+import com.nhom3.personalfinance.data.db.dao.UserDao;
+import com.nhom3.personalfinance.data.model.User;
+import com.nhom3.personalfinance.viewmodel.AccountViewModel;
+import com.nhom3.personalfinance.viewmodel.AccountViewModelFactory;
 
 public class ChangePasswordActivity extends AppCompatActivity {
+    private AccountViewModel viewModel;
 
-    private AuthViewModel viewModel;
-    private TextInputEditText edtOldPass, edtNewPass, edtConfirmPass;
-    private Button btnSavePassword;
+    private static final String PREF_NAME = "AUTH_PREFS";
+    private static final String PREF_USER_ID = "current_user_id";
 
-    // Giả sử bạn lưu username khi đăng nhập, nếu không hãy dùng "admin"
-    private String currentUsername;
+    private EditText currentPasswordInput, newPasswordInput, confirmPasswordInput;
+    private Button saveButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_change_password);
 
-        // --- THÊM DÒNG NÀY VÀO ---
-        viewModel = new ViewModelProvider(this).get(AuthViewModel.class);
-        // --- HẾT ---
-
-        edtOldPass = findViewById(R.id.edit_text_old_password);
-        edtNewPass = findViewById(R.id.edit_text_new_password);
-        edtConfirmPass = findViewById(R.id.edit_text_confirm_password);
-        btnSavePassword = findViewById(R.id.button_save_password);
-        // --- BƯỚC SỬA: ĐỌC USERNAME TỪ SESSION ---
-        // ĐỌC USERNAME TỪ "PHIÊN LÀM VIỆC"
-        SharedPreferences prefs = getSharedPreferences("AppPrefs", MODE_PRIVATE);
-        currentUsername = prefs.getString("LOGGED_IN_USER", null); // Lấy username đã lưu
-        // --- KẾT THÚC BƯỚC SỬA ---
-
-        btnSavePassword.setOnClickListener(v -> handleChangePassword());
-    }
-
-    private void handleChangePassword() {
-        String oldPass = edtOldPass.getText().toString();
-        String newPass = edtNewPass.getText().toString();
-        String confirmPass = edtConfirmPass.getText().toString();
-
-        if (oldPass.isEmpty() || newPass.isEmpty() || confirmPass.isEmpty()) {
-            Toast.makeText(this, "Vui lòng nhập đủ thông tin", Toast.LENGTH_SHORT).show();
+        int currentUserId = getSharedPreferences(PREF_NAME, MODE_PRIVATE).getInt(PREF_USER_ID, -1);
+        if (currentUserId == -1) {
+            Toast.makeText(this, "Lỗi: Phiên đăng nhập không hợp lệ.", Toast.LENGTH_SHORT).show();
+            finish();
             return;
         }
 
-        if (!newPass.equals(confirmPass)) {
-            Toast.makeText(this, "Mật khẩu mới không khớp!", Toast.LENGTH_SHORT).show();
-            return;
-        }
+        UserDao userDao = AppDatabase.getDatabase(this).userDao();
+        AccountViewModelFactory factory = new AccountViewModelFactory(userDao, currentUserId);
+        viewModel = new ViewModelProvider(this, factory).get(AccountViewModel.class);
 
-        // SỬA LỖI Ở ĐÂY
-        viewModel.changePassword(currentUsername, oldPass, newPass, (user, message) -> { // Đổi "success" thành "user"
-            runOnUiThread(() -> {
-                Toast.makeText(ChangePasswordActivity.this, message, Toast.LENGTH_SHORT).show();
-                if (user != null) { // Đổi "if (success)" thành "if (user != null)"
-                    finish(); // Đóng màn hình nếu thành công
+        currentPasswordInput = findViewById(R.id.edit_text_old_password);
+        newPasswordInput = findViewById(R.id.edit_text_new_password);
+        confirmPasswordInput = findViewById(R.id.edit_text_confirm_password);
+        saveButton = findViewById(R.id.button_save_password);
+
+        // Vô hiệu hóa nút LƯU cho đến khi dữ liệu tải xong
+        saveButton.setEnabled(false);
+
+        //  1. Observer để kích hoạt nút sau khi dữ liệu tải
+        viewModel.getCurrentUser().observe(this, new Observer<User>() {
+            @Override
+            public void onChanged(User user) {
+                if (user != null) {
+                    saveButton.setEnabled(true);
+                    // Ngừng observe sau lần tải thành công đầu tiên
+                    viewModel.getCurrentUser().removeObserver(this);
                 }
-            });
+            }
+        });
+
+        //  2. Observer để nhận thông báo kết quả (validation, lỗi cũ sai, thành công)
+        viewModel.getPasswordChangeMessage().observe(this, message -> {
+            if (message != null && !message.isEmpty()) {
+                Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+
+                // Nếu thành công, đóng Activity và quay về trang trước
+                if (message.equals("Đổi mật khẩu thành công!")) {
+                    finish();
+                }
+            }
+        });
+
+        //  3. Gắn Listener vào nút
+        saveButton.setOnClickListener(v -> {
+            String currentPass = currentPasswordInput.getText().toString();
+            String newPass = newPasswordInput.getText().toString();
+            String confirmPass = confirmPasswordInput.getText().toString();
+
+            // Kiểm tra UI: Mật khẩu mới và xác nhận có khớp không
+            if (newPass.isEmpty() || currentPass.isEmpty()) {
+                Toast.makeText(this, "Vui lòng nhập đầy đủ thông tin.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (!newPass.equals(confirmPass)) {
+                Toast.makeText(this, "Mật khẩu mới và xác nhận mật khẩu không khớp.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Gọi phương thức mới trong ViewModel để xử lý logic đổi mật khẩu
+            viewModel.validateAndChangePassword(currentPass, newPass);
         });
     }
+
+
 }
