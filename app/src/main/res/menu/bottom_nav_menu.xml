@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/nav_home"
+        android:icon="@drawable/ic_home_24"
+        android:title="Tổng quan" />
+
+    <item
+        android:id="@+id/nav_wallets"
+        android:icon="@drawable/ic_wallet_24"
+        android:title="Ví" />
+
+    <item
+        android:id="@+id/nav_add"
+        android:icon="@drawable/ic_add_24"
+        android:title="Thêm" />
+
+    <item
+        android:id="@+id/nav_reports"
+        android:icon="@drawable/ic_baocao_24"
+        android:title="Báo cáo" />
+
+    <item
+        android:id="@+id/nav_account"
+        android:icon="@drawable/ic_account_24"
+        android:title="Tài khoản" />
+
+</menu>

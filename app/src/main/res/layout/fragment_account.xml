@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F5F5"
+    android:orientation="vertical"
+    tools:context=".ui.main.AccountFragment">
+
+    <!-- Phần thông tin người dùng -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:background="@android:color/white"
+        android:gravity="center">
+
+        <ImageView
+            android:id="@+id/imgAvatar"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@drawable/ic_avt_24"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:id="@+id/tvUsername"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="admin"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#000000" />
+    </LinearLayout>
+
+    <!-- Danh sách chức năng -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Ví của tôi -->
+            <TextView
+                android:id="@+id/tvWallet"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:background="@android:color/white"
+                android:text="Ví của tôi"
+                android:textSize="16sp"
+                android:drawableEnd="@android:drawable/ic_menu_more"
+                android:drawablePadding="8dp"
+                android:layout_marginBottom="8dp" />
+
+            <!-- Nhóm -->
+            <TextView
+                android:id="@+id/tvGroup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:background="@android:color/white"
+                android:text="Nhóm"
+                android:textSize="16sp"
+                android:drawableEnd="@android:drawable/ic_menu_more"
+                android:drawablePadding="8dp"
+                android:layout_marginBottom="8dp" />
+
+            <!-- Đổi mật khẩu -->
+            <TextView
+                android:id="@+id/tvChangePassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:text="Đổi mật khẩu"
+                android:textColor="#1E88E5"
+                android:textSize="16sp"
+                android:background="@android:color/white"
+                android:drawableEnd="@android:drawable/ic_menu_edit"
+                android:drawablePadding="8dp"
+                android:layout_marginBottom="8dp" />
+
+            <!-- Đăng xuất -->
+            <TextView
+                android:id="@+id/tvLogout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:text="Đăng xuất"
+                android:textColor="#F57C00"
+                android:textSize="16sp"
+                android:background="@android:color/white"
+                android:drawableEnd="@android:drawable/ic_lock_power_off"
+                android:drawablePadding="8dp"
+                android:layout_marginBottom="8dp" />
+
+            <!-- Xóa tài khoản -->
+            <TextView
+                android:id="@+id/tvDeleteAccount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:text="Xóa tài khoản"
+                android:textColor="#D32F2F"
+                android:textSize="16sp"
+                android:background="@android:color/white"
+                android:drawableEnd="@android:drawable/ic_delete"
+                android:drawablePadding="8dp" />
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>
