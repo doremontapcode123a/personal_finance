@@ -16,11 +16,11 @@
 
     <item
         android:id="@+id/nav_statistics"
-        android:icon="@drawable/ic_baocao_24"
+        android:icon="@drawable/ic_coin_24"
         android:title="Báo cáo" />
 
     <item
         android:id="@+id/nav_account"
-        android:icon="@drawable/ic_ac_24"
+        android:icon="@drawable/ic_account_24"
         android:title="Tài khoản" />
 </menu>
