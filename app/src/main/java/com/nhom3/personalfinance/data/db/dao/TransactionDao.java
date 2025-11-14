@@ -88,5 +88,4 @@ public interface TransactionDao {
     List<CategoryPieChartDto> getExpenseByCategoryForPieChart(int userId, Date startDate, Date endDate);
     @Query("SELECT * FROM `TRANSACTION` WHERE USERid = :userId ORDER BY date DESC LIMIT 10")
     LiveData<List<Transaction>> getTop10RecentTransactions(int userId);
-
 }
