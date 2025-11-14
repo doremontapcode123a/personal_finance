@@ -1,15 +1,14 @@
+package com.nhom3.personalfinance.ui.main; // SỬA: Đảm bảo package là ui.activity
 
-package com.nhom3.personalfinance.ui.main;
 import android.graphics.Color;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar; // <-- Import Toolbar
 
-//import com.example.login_qltk.R;
-import com.nhom3.personalfinance.R;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.ViewModelProvider; // Thêm import
+
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.charts.PieChart;
-import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
@@ -17,184 +16,149 @@ import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.formatter.PercentFormatter;
+import com.github.mikephil.charting.utils.ColorTemplate;
+import com.nhom3.personalfinance.R;
+import com.nhom3.personalfinance.data.dto.CategoryPieChartDto;
+import com.nhom3.personalfinance.data.dto.MonthlyTransactionDto;
+import com.nhom3.personalfinance.viewmodel.ReportViewModel; // Thêm import
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class BaoCaoThuChiActivity extends AppCompatActivity {
+
+    private ReportViewModel reportViewModel;
+    private LineChart lineChart;
+    private PieChart pieThu, pieChi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bao_cao_thu_chi);
 
+        // Khởi tạo ViewModel
+        reportViewModel = new ViewModelProvider(this).get(ReportViewModel.class);
+
         // --- Cấu hình Toolbar ---
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        // Bật nút quay lại (hình mũi tên) trên Toolbar
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
         }
 
         // --- Ánh xạ các biểu đồ từ layout ---
-        // (Nút btnQuayLai đã bị loại bỏ vì ta dùng Toolbar)
-        LineChart lineChart = findViewById(R.id.lineChartThuChi);
-        PieChart pieThu = findViewById(R.id.pieChartThu);
-        PieChart pieChi = findViewById(R.id.pieChartChi);
+        lineChart = findViewById(R.id.lineChartThuChi);
+        pieThu = findViewById(R.id.pieChartThu);
+        pieChi = findViewById(R.id.pieChartChi);
 
-        // --- Thiết lập dữ liệu và giao diện cho các biểu đồ ---
-        setupLineChart(lineChart);
-        setupPieChartThu(pieThu);
-        setupPieChartChi(pieChi);
+        // --- Bắt đầu quan sát dữ liệu từ ViewModel ---
+        observeViewModel();
     }
 
-    // --- Thêm phương thức này để xử lý sự kiện khi nhấn nút quay lại trên Toolbar ---
+    private void observeViewModel() {
+        // Quan sát dữ liệu cho biểu đồ đường
+        reportViewModel.getMonthlyTransactions().observe(this, this::setupLineChart);
+
+        // Quan sát dữ liệu cho biểu đồ tròn Thu
+        reportViewModel.getIncomeByCategory().observe(this, categoryData ->
+                setupPieChart(pieThu, categoryData, "Tổng Thu", ColorTemplate.MATERIAL_COLORS));
+
+        // Quan sát dữ liệu cho biểu đồ tròn Chi
+        reportViewModel.getExpenseByCategory().observe(this, categoryData ->
+                setupPieChart(pieChi, categoryData, "Tổng Chi", ColorTemplate.JOYFUL_COLORS));
+    }
+
     @Override
     public boolean onSupportNavigateUp() {
-        onBackPressed();
+        onBackPressed(); // Xử lý khi nhấn nút back trên toolbar
         return true;
     }
 
-    /**
-     * Thiết lập và hiển thị dữ liệu cho Biểu đồ đường (LineChart)
-     */
-    private void setupLineChart(LineChart lineChart) {
-        // --- Chuẩn hóa dữ liệu ---
+    private void setupLineChart(List<MonthlyTransactionDto> data) {
+        if (data == null || data.isEmpty()) {
+            lineChart.clear(); // Xóa dữ liệu cũ nếu không có dữ liệu mới
+            lineChart.setNoDataText("Không có dữ liệu cho biểu đồ.");
+            lineChart.invalidate();
+            return;
+        }
+
         ArrayList<Entry> thuEntries = new ArrayList<>();
-        thuEntries.add(new Entry(1, 15000000));
-        thuEntries.add(new Entry(2, 0));
-        thuEntries.add(new Entry(3, 0));
-        thuEntries.add(new Entry(4, 0));
-        thuEntries.add(new Entry(5, 2800000));
-        thuEntries.add(new Entry(6, 0));
-        thuEntries.add(new Entry(7, 0));
-        thuEntries.add(new Entry(8, 0));
-        thuEntries.add(new Entry(9, 0));
-        thuEntries.add(new Entry(10, 10000000));
-
         ArrayList<Entry> chiEntries = new ArrayList<>();
-        chiEntries.add(new Entry(1, 0));
-        chiEntries.add(new Entry(2, 0));
-        chiEntries.add(new Entry(3, 60000));
-        chiEntries.add(new Entry(4, 0));
-        chiEntries.add(new Entry(5, 0));
-        chiEntries.add(new Entry(6, 45000));
-        chiEntries.add(new Entry(7, 0));
-        chiEntries.add(new Entry(8, 0));
-        chiEntries.add(new Entry(9, 25000));
-        chiEntries.add(new Entry(10, 0));
+        ArrayList<String> labels = new ArrayList<>();
 
-        // --- Cấu hình cho đường "Khoản thu" ---
+        for (int i = 0; i < data.size(); i++) {
+            MonthlyTransactionDto dto = data.get(i);
+            thuEntries.add(new Entry(i, (float) dto.totalIncome));
+            // Lấy giá trị tuyệt đối của tổng chi để vẽ biểu đồ
+            chiEntries.add(new Entry(i, (float) Math.abs(dto.totalExpense)));
+            // Tạo nhãn dạng "Th01/2024"
+            labels.add(String.format("Th%02d/%d", dto.month, dto.year));
+        }
+
         LineDataSet setThu = new LineDataSet(thuEntries, "Khoản thu");
-        setThu.setColor(0xFF43A047); // Màu xanh lá
+        setThu.setColor(Color.parseColor("#43A047")); // Xanh lá
         setThu.setLineWidth(2.5f);
-        setThu.setCircleColor(0xFF43A047);
-        setThu.setCircleRadius(5f);
-        setThu.setDrawValues(false); // Ẩn giá trị trên các điểm
+        setThu.setCircleColor(Color.parseColor("#43A047"));
+        setThu.setDrawValues(false);
 
-        // --- Cấu hình cho đường "Khoản chi" ---
         LineDataSet setChi = new LineDataSet(chiEntries, "Khoản chi");
-        setChi.setColor(0xFFE53935); // Màu đỏ
+        setChi.setColor(Color.parseColor("#E53935")); // Đỏ
         setChi.setLineWidth(2.5f);
-        setChi.setCircleColor(0xFFE53935);
-        setChi.setCircleRadius(5f);
+        setChi.setCircleColor(Color.parseColor("#E53935"));
         setChi.setDrawValues(false);
 
-        // --- Cấu hình chung cho biểu đồ ---
         LineData lineData = new LineData(setThu, setChi);
         lineChart.setData(lineData);
-        lineChart.getDescription().setEnabled(false); // Ẩn mô tả mặc định của thư viện
-        lineChart.setDrawGridBackground(false);
 
-        // Cấu hình trục X (trục ngang)
+        // Cấu hình trục X
         XAxis xAxis = lineChart.getXAxis();
+        xAxis.setValueFormatter(new IndexAxisValueFormatter(labels));
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxis.setGranularity(1f); // Đảm bảo các giá trị trên trục X là số nguyên
-        xAxis.setDrawGridLines(false);
+        xAxis.setGranularity(1f);
+        xAxis.setLabelRotationAngle(-45); // Xoay nhãn để dễ đọc nếu có nhiều tháng
 
-        // Cấu hình trục Y (trục đứng)
-        lineChart.getAxisLeft().setDrawGridLines(true);
-        lineChart.getAxisRight().setEnabled(false); // Ẩn trục Y bên phải
-
-        // Cấu hình chú thích (Legend)
-        Legend legend = lineChart.getLegend();
-        legend.setVerticalAlignment(Legend.LegendVerticalAlignment.TOP);
-        legend.setHorizontalAlignment(Legend.LegendHorizontalAlignment.CENTER);
-        legend.setOrientation(Legend.LegendOrientation.HORIZONTAL);
-        legend.setDrawInside(false);
-
-        // Thêm hiệu ứng và vẽ lại biểu đồ
+        lineChart.getDescription().setEnabled(false);
         lineChart.animateX(1500);
-        lineChart.invalidate();
+        lineChart.invalidate(); // Vẽ lại biểu đồ
     }
 
-    /**
-     * Thiết lập và hiển thị dữ liệu cho Biểu đồ tròn Khoản thu (PieChart)
-     */
-    private void setupPieChartThu(PieChart pieChart) {
+    private void setupPieChart(PieChart pieChart, List<CategoryPieChartDto> data, String centerText, int[] colors) {
+        if (data == null || data.isEmpty()) {
+            pieChart.clear(); // Xóa dữ liệu cũ
+            pieChart.setNoDataText("Không có dữ liệu.");
+            pieChart.invalidate();
+            return;
+        }
+
         ArrayList<PieEntry> entries = new ArrayList<>();
-        entries.add(new PieEntry(85, "Lương"));
-        entries.add(new PieEntry(15, "Thưởng"));
+        for (CategoryPieChartDto dto : data) {
+            // Dùng giá trị tuyệt đối để miếng bánh luôn dương
+            entries.add(new PieEntry((float) Math.abs(dto.totalAmount), dto.categoryName));
+        }
 
         PieDataSet dataSet = new PieDataSet(entries, "");
-        dataSet.setColors(new int[]{0xFF43A047, 0xFF81C784});
-        dataSet.setValueTextColor(Color.WHITE);
-        dataSet.setValueTextSize(12f);
-        dataSet.setSliceSpace(2f); // Khoảng cách giữa các miếng bánh
-
-        PieData data = new PieData(dataSet);
-        data.setValueFormatter(new PercentFormatter(pieChart)); // Hiển thị dạng %
-
-        // --- Cấu hình chung cho biểu đồ ---
-        pieChart.setData(data);
-        pieChart.setUsePercentValues(true);
-        pieChart.getDescription().setEnabled(false);
-        pieChart.setDrawHoleEnabled(true); // Vẽ lỗ ở giữa
-        pieChart.setHoleColor(Color.TRANSPARENT);
-        pieChart.setEntryLabelColor(Color.BLACK); // Màu của nhãn "Lương", "Thưởng"
-
-        pieChart.setCenterText("Tổng Thu");
-        pieChart.setCenterTextSize(14f);
-        pieChart.getLegend().setEnabled(false); // Ẩn chú thích (đã có nhãn trên miếng bánh)
-
-        // Thêm hiệu ứng và vẽ lại
-        pieChart.animateY(1000);
-        pieChart.invalidate();
-    }
-
-    /**
-     * Thiết lập và hiển thị dữ liệu cho Biểu đồ tròn Khoản chi (PieChart)
-     */
-    private void setupPieChartChi(PieChart pieChart) {
-        ArrayList<PieEntry> entries = new ArrayList<>();
-        entries.add(new PieEntry(60, "Ăn uống"));
-        entries.add(new PieEntry(25, "Đi lại"));
-        entries.add(new PieEntry(15, "Khác"));
-
-        PieDataSet dataSet = new PieDataSet(entries, "");
-        dataSet.setColors(new int[]{0xFFE53935, 0xFFFF7043, 0xFFFFB74D});
-        dataSet.setValueTextColor(Color.WHITE);
+        dataSet.setColors(colors);
+        dataSet.setValueTextColor(Color.BLACK);
         dataSet.setValueTextSize(12f);
         dataSet.setSliceSpace(2f);
 
-        PieData data = new PieData(dataSet);
-        data.setValueFormatter(new PercentFormatter(pieChart));
+        PieData pieData = new PieData(dataSet);
+        pieData.setValueFormatter(new PercentFormatter(pieChart));
 
-        // --- Cấu hình chung cho biểu đồ ---
-        pieChart.setData(data);
+        pieChart.setData(pieData);
         pieChart.setUsePercentValues(true);
         pieChart.getDescription().setEnabled(false);
         pieChart.setDrawHoleEnabled(true);
         pieChart.setHoleColor(Color.TRANSPARENT);
-        pieChart.setEntryLabelColor(Color.BLACK);
+        pieChart.setEntryLabelColor(Color.BLACK); // Màu chữ của tên danh mục trên miếng bánh
+        pieChart.setCenterText(centerText);
+        pieChart.setCenterTextSize(16f);
+        pieChart.getLegend().setEnabled(false); // Ẩn chú thích (legend) để gọn gàng hơn
 
-        pieChart.setCenterText("Tổng Chi");
-        pieChart.setCenterTextSize(14f);
-        pieChart.getLegend().setEnabled(false);
-
-        // Thêm hiệu ứng và vẽ lại
-        pieChart.animateY(1000);
-        pieChart.invalidate();
+        pieChart.animateY(1400);
+        pieChart.invalidate(); // Vẽ lại biểu đồ
     }
 }

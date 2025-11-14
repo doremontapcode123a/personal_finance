@@ -108,11 +108,13 @@
                         android:padding="16dp">
 
                         <TextView
+
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Tổng đã chi" />
 
                         <TextView
+                            android:id="@+id/btnTongChi"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="172,000 ₫"
@@ -144,6 +146,7 @@
                             android:text="Tổng đã thu" />
 
                         <TextView
+                            android:id="@+id/btnTongThu"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="27,500,000 ₫"

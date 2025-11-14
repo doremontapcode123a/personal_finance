@@ -131,6 +131,7 @@ public class AddEditTransactionActivity extends AppCompatActivity {
             // Cập nhật adapter nếu đang ở tab Chi
             if (selectedType == 0) {
                 expenseCategoryAdapter.notifyDataSetChanged();
+//                spinnerCategory.setAdapter(expenseCategoryAdapter);
             }
         });
     }

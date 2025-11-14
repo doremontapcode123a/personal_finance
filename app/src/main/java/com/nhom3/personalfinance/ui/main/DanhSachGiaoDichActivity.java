@@ -1,58 +1,69 @@
-// File: DanhSachGiaoDichActivity.java
-package com.nhom3.personalfinance.ui.main; // Thêm package cho đúng chuẩn
+package com.nhom3.personalfinance.ui.main;
 
 import android.os.Bundle;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.nhom3.personalfinance.R;
-// Giả sử đường dẫn đúng của bạn là như thế này
-import com.nhom3.personalfinance.ui.transaction.GiaoDichAdapter;
-import com.nhom3.personalfinance.data.model.GiaoDich;
+import com.nhom3.personalfinance.ui.transaction.AllTransactionsAdapter; // Sửa: Import Adapter từ package mới
+import com.nhom3.personalfinance.viewmodel.AllTransactionsViewModel; // Sửa: Import ViewModel từ package mới
 
 import java.util.ArrayList;
 
-// Lớp bắt đầu ở đây
 public class DanhSachGiaoDichActivity extends AppCompatActivity {
 
-    // Toàn bộ code phải nằm trong lớp này
+    private AllTransactionsViewModel viewModel;
+    private AllTransactionsAdapter adapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_danh_sach_giao_dich);
 
-        // --- BẮT ĐẦU CODE XỬ LÝ TOOLBAR (BẠN CẦN THÊM VÀO) ---
+        // Khởi tạo ViewModel từ file riêng
+        viewModel = new ViewModelProvider(this).get(AllTransactionsViewModel.class);
+
+        // --- Cấu hình Toolbar ---
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
+            getSupportActionBar().setTitle("Giao dịch gần đây");
         }
 
-        toolbar.setNavigationOnClickListener(v -> {
-            finish(); // Đóng activity khi nhấn nút quay lại
-        });
-        // --- KẾT THÚC CODE XỬ LÝ TOOLBAR ---
-
-
-        // --- BẮT ĐẦU CODE XỬ LÝ RECYCLERVIEW ---
+        // --- Ánh xạ & Cấu hình RecyclerView ---
         RecyclerView recyclerView = findViewById(R.id.recycler_view_all_transactions);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        setupRecyclerView(recyclerView);
 
-        // TẠO DỮ LIỆU MẪU
-        ArrayList<GiaoDich> danhSach = new ArrayList<>();
-        danhSach.add(new GiaoDich("Ăn trưa", "10/11/2025", -50000));
-        danhSach.add(new GiaoDich("Tiền lương tháng 11", "05/11/2025", 10000000));
-        danhSach.add(new GiaoDich("Đổ xăng", "09/11/2025", -70000));
-        danhSach.add(new GiaoDich("Mua sắm online", "08/11/2025", -550000));
-
-        // KHỞI TẠO ADAPTER VÀ GÁN VÀO RECYCLERVIEW
-        // Hãy chắc chắn đường dẫn `import` của GiaoDichAdapter là đúng
-        GiaoDichAdapter adapter = new GiaoDichAdapter(this, danhSach);
-        recyclerView.setAdapter(adapter);
-        // --- KẾT THÚC CODE XỬ LÝ RECYCLERVIEW ---
+        // --- Bắt đầu quan sát dữ liệu từ ViewModel ---
+        observeViewModel();
     }
-} // Lớp kết thúc ở đây
+
+    private void setupRecyclerView(RecyclerView recyclerView) {
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        // Khởi tạo Adapter từ file riêng
+        adapter = new AllTransactionsAdapter(this, new ArrayList<>());
+        recyclerView.setAdapter(adapter);
+    }
+
+    private void observeViewModel() {
+        // Quan sát danh sách 10 giao dịch gần nhất
+        viewModel.getTop10RecentTransactions().observe(this, transactions -> {
+            if (transactions != null) {
+                adapter.updateData(transactions);
+            }
+        });
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        // Xử lý khi nhấn nút back trên toolbar
+        finish();
+        return true;
+    }
+}
