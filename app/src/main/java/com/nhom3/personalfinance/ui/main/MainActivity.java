@@ -12,6 +12,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.nhom3.personalfinance.R;
 
 // Đảm bảo bạn đã import 4 Fragment rỗng
+import com.nhom3.personalfinance.notification.NotificationHelper;
 import com.nhom3.personalfinance.ui.main.HomeFragment;
 import com.nhom3.personalfinance.ui.main.TransactionListFragment;
 import com.nhom3.personalfinance.ui.main.StatisticsFragment; // Fragment cho tab "Báo cáo"
@@ -28,6 +29,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        NotificationHelper.createNotificationChannel(this);
+        NotificationHelper.setDailyAlarm(this);
 
         bottomNavigationView = findViewById(R.id.bottom_nav_view);
         fabAddTransaction = findViewById(R.id.fab_add_transaction);
