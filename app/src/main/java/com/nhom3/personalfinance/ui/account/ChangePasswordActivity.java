@@ -17,7 +17,7 @@ import com.nhom3.personalfinance.viewmodel.AccountViewModelFactory;
 public class ChangePasswordActivity extends AppCompatActivity {
     private AccountViewModel viewModel;
 
-    private static final String PREF_NAME = "AUTH_PREFS";
+    private static final String PREF_NAME = "AppPrefs";
     private static final String PREF_USER_ID = "current_user_id";
 
     private EditText currentPasswordInput, newPasswordInput, confirmPasswordInput;
@@ -44,8 +44,8 @@ public class ChangePasswordActivity extends AppCompatActivity {
         confirmPasswordInput = findViewById(R.id.edit_text_confirm_password);
         saveButton = findViewById(R.id.button_save_password);
 
-        // Vô hiệu hóa nút LƯU cho đến khi dữ liệu tải xong
-        saveButton.setEnabled(false);
+
+        saveButton.setEnabled(true);
 
         //  1. Observer để kích hoạt nút sau khi dữ liệu tải
         viewModel.getCurrentUser().observe(this, new Observer<User>() {
@@ -53,7 +53,6 @@ public class ChangePasswordActivity extends AppCompatActivity {
             public void onChanged(User user) {
                 if (user != null) {
                     saveButton.setEnabled(true);
-                    // Ngừng observe sau lần tải thành công đầu tiên
                     viewModel.getCurrentUser().removeObserver(this);
                 }
             }

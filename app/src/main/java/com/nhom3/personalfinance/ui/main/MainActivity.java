@@ -103,9 +103,7 @@ public class MainActivity extends AppCompatActivity {
             requestExactAlarmPermissionLauncher.launch(intent);
         }
     }
-
-
-    // --- CÁC HÀM CŨ GIỮ NGUYÊN ---
+    
 
     private void setupBottomNavigation() {
         bottomNavigationView.setOnItemSelectedListener(item -> {
@@ -118,8 +116,6 @@ public class MainActivity extends AppCompatActivity {
                 selectedFragment = new TransactionListFragment();
             } else if (itemId == R.id.nav_budget) {
                 selectedFragment = new BudgetFragment();
-                // (Thay vì nav_statistics và StatisticsFragment)
-                // --- HẾT SỬA ---
             } else if (itemId == R.id.nav_account) {
                 selectedFragment = new AccountFragment();
             }
@@ -146,7 +142,6 @@ public class MainActivity extends AppCompatActivity {
         fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 
         FragmentTransaction transaction = fragmentManager.beginTransaction();
-        // Sửa lại ID container nếu bạn không dùng Navigation Component
         transaction.replace(R.id.nav_host_fragment, fragment);
         transaction.commit();
     }
