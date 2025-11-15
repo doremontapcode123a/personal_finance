@@ -15,9 +15,9 @@
         android:enabled="false" />
 
     <item
-        android:id="@+id/nav_statistics"
+        android:id="@+id/nav_budget"
         android:icon="@drawable/ic_coin_24"
-        android:title="Báo cáo" />
+        android:title="Ngân sách" />
 
     <item
         android:id="@+id/nav_account"
