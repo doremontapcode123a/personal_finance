@@ -33,8 +33,8 @@ import com.nhom3.personalfinance.ui.auth.LoginActivity;
 public class AccountFragment extends Fragment {
 
     private TextView btnManageWallets, btnManageCategories, btnChangePassword, btnLogout, btnDeleteAccount;
-    private AuthViewModel authViewModel; // <-- BIẾN MỚI
-    private TextView textUsername; // <-- BIẾN MỚI
+    private AuthViewModel authViewModel;
+    private TextView textUsername;
     private String currentUsername;
 
     @Override
@@ -42,10 +42,8 @@ public class AccountFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_account, container, false);
 
-        // Ánh xạ
-        // --- THÊM DÒNG NÀY VÀO ---
+
         authViewModel = new ViewModelProvider(requireActivity()).get(AuthViewModel.class);
-        // --- HẾT ---
         textUsername = view.findViewById(R.id.text_view_username);
         btnManageWallets = view.findViewById(R.id.btn_manage_wallets);
         btnManageCategories = view.findViewById(R.id.btn_manage_categories);
@@ -53,12 +51,12 @@ public class AccountFragment extends Fragment {
         btnLogout = view.findViewById(R.id.btn_logout);
         btnDeleteAccount = view.findViewById(R.id.btn_delete_account);
 
-        // --- BƯỚC SỬA: ĐỌC USERNAME TỪ SESSION ---
+        // ---  ĐỌC USERNAME TỪ SESSION ---
         SharedPreferences prefs = getActivity().getSharedPreferences("AppPrefs", Context.MODE_PRIVATE);
         currentUsername = prefs.getString("LOGGED_IN_USER", "Lỗi User"); // Lấy username đã lưu
         textUsername.setText(currentUsername); // Cập nhật TextView "admin"
         // --- KẾT THÚC BƯỚC SỬA ---
-        // Cài đặt listener
+
         setupListeners();
 
         return view;
@@ -74,19 +72,15 @@ public class AccountFragment extends Fragment {
 
         // Nút "Đổi mật khẩu"
         btnChangePassword.setOnClickListener(v -> {
-            // (Chúng ta cũng cần truyền username cho Activity này)
             Intent intent = new Intent(getActivity(), ChangePasswordActivity.class);
-            // intent.putExtra("USERNAME", currentUsername); // (Cách 1)
+            // intent.putExtra("USERNAME", currentUsername);
             startActivity(intent);
         });
 
         // Nút "Đăng xuất"
         btnLogout.setOnClickListener(v -> {
-            // Xóa SharedPreferences (nếu có)
-            // --- BƯỚC NÊN LÀM ---
             SharedPreferences prefs = getActivity().getSharedPreferences("AppPrefs", Context.MODE_PRIVATE);
             prefs.edit().remove("LOGGED_IN_USER").apply();
-            // --- HẾT ---
             // Quay về màn hình Đăng nhập
             Intent intent = new Intent(getActivity(), LoginActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -104,11 +98,8 @@ public class AccountFragment extends Fragment {
             startActivity(intent);
         });
     }
-    // --- HÀM MỚI: HIỂN THỊ DIALOG XÁC NHẬN XÓA ---
-    // (Y hệt Hình 2.7.3.b )
+    // --- HÀM  HIỂN THỊ DIALOG XÁC NHẬN XÓA ---
     private void showConfirmDeleteDialog() {
-        // --- Sửa: Thêm 1 ô nhập mật khẩu để xác thực ---
-        // (An toàn hơn là chỉ nhấn "Xóa")
         final EditText inputPassword = new EditText(getContext());
         inputPassword.setHint("Nhập mật khẩu để xác nhận");
         inputPassword.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
@@ -124,7 +115,6 @@ public class AccountFragment extends Fragment {
                         return;
                     }
 
-                    // --- SỬA LỖI Ở ĐÂY ---
                     authViewModel.deleteAccount(currentUsername, password, (user, message) -> { // Đổi "success" thành "user"
                         if (getActivity() == null) {
                             return;
@@ -137,7 +127,7 @@ public class AccountFragment extends Fragment {
                             }
                         });
                     });
-                    // --- KẾT THÚC SỬA LỖI ---
+
                 })
                 .setNegativeButton("Hủy", null)
                 .show();

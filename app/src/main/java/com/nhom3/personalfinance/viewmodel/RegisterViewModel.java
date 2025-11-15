@@ -3,8 +3,10 @@ package com.nhom3.personalfinance.viewmodel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
+
 import com.nhom3.personalfinance.data.db.dao.UserDao;
 import com.nhom3.personalfinance.data.model.User;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Pattern;
@@ -17,15 +19,14 @@ public class RegisterViewModel extends ViewModel {
     private final MutableLiveData<String> registrationMessage = new MutableLiveData<>();
     private final MutableLiveData<Boolean> isRegistrationComplete = new MutableLiveData<>();
 
-    private static final int MIN_PASSWORD_LENGTH = 6;
+    private static final int MIN_PASSWORD_LENGTH = 8;
 
     private static final Pattern PASSWORD_PATTERN =
-            Pattern.compile("^.{6,}$"); // ✅ Sửa Regex
+            Pattern.compile("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$");
 
-
-    // Getters
-    public LiveData<String> getRegistrationMessage() { return registrationMessage; }
-
+    public LiveData<String> getRegistrationMessage() {
+        return registrationMessage;
+    }
 
     public RegisterViewModel(UserDao userDao) {
         this.userDao = userDao;
@@ -41,34 +42,33 @@ public class RegisterViewModel extends ViewModel {
             return false;
         }
         if (!PASSWORD_PATTERN.matcher(password).matches()) {
-            registrationMessage.postValue("Mật khẩu không hợp lệ.");
+            registrationMessage.postValue("Mật khẩu phải có ít nhất 1 chữ và 1 số.");
             return false;
         }
         return true;
     }
 
-
     public void register(String username, String password) {
-        // Đặt lại giá trị cho thông báo và cờ điều hướng
         registrationMessage.postValue(null);
         isRegistrationComplete.postValue(false);
 
-        // --- 1. KIỂM TRA ĐIỀU KIỆN ĐẦU VÀO ---
+        // --- Validate Username ---
         if (username == null || username.trim().isEmpty()) {
             registrationMessage.postValue("Tên đăng nhập không được để trống.");
             return;
         }
 
+        // --- Validate Password ---
         if (!isValidPassword(password)) {
             return;
         }
 
         executorService.execute(() -> {
             try {
-                // TODO: HASH MẬT KHẨU TRƯỚC KHI LƯU (BẮT BUỘC!)
+                // TODO: HASH mật khẩu trước khi lưu
                 String hashedPassword = password;
 
-                // Kiểm tra tên đăng nhập đã tồn tại trong DB
+                // Kiểm tra xem username đã tồn tại chưa
                 if (userDao.getUserByUsername(username) != null) {
                     registrationMessage.postValue("Tên đăng nhập đã tồn tại. Vui lòng chọn tên khác.");
                     return;
