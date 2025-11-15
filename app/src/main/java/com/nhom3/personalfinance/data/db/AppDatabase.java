@@ -11,6 +11,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import com.nhom3.personalfinance.data.db.dao.*;
 import com.nhom3.personalfinance.data.model.*;
+ // Đảm bảo bạn dùng đúng tên file Converter
 
 import java.util.concurrent.Executors;
 
@@ -22,10 +23,10 @@ import java.util.concurrent.Executors;
         Transaction.class,
         Budget.class
 },
-        version = 2,
+        version = 3, // Giữ nguyên version 3 (hoặc tăng lên 4 nếu bạn đã gỡ cài đặt)
         exportSchema = false
 )
-@TypeConverters({Converters.class})
+@TypeConverters({Converters.class}) // Giữ nguyên tên file Converter của bạn
 public abstract class AppDatabase extends RoomDatabase {
 
     public abstract UserDao userDao();
@@ -44,6 +45,11 @@ public abstract class AppDatabase extends RoomDatabase {
                                     AppDatabase.class, "personal_finance_db")
                             .fallbackToDestructiveMigration()
                             .addCallback(sRoomDatabaseCallback)
+
+                            // --- THÊM DÒNG NÀY ĐỂ SỬA LỖI CRASH ---
+                            .allowMainThreadQueries()
+                            // ------------------------------------
+
                             .build();
                 }
             }
@@ -57,10 +63,13 @@ public abstract class AppDatabase extends RoomDatabase {
         public void onCreate(@NonNull SupportSQLiteDatabase db) {
             super.onCreate(db);
             Executors.newSingleThreadExecutor().execute(() -> {
-                // CHỈ TẠO KHUNG XƯƠNG GỐC (THU/CHI)
-                // Dùng SQL trực tiếp để đảm bảo nó chạy trước mọi logic khác
-                db.execSQL("INSERT OR IGNORE INTO CATEGORY (id, name) VALUES (1, 'Thu')");
-                db.execSQL("INSERT OR IGNORE INTO CATEGORY (id, name) VALUES (2, 'Chi')");
+                // Chỉ tạo khung xương Thu/Chi
+                try {
+                    db.execSQL("INSERT OR IGNORE INTO CATEGORY (id, name) VALUES (1, 'Thu')");
+                    db.execSQL("INSERT OR IGNORE INTO CATEGORY (id, name) VALUES (2, 'Chi')");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             });
         }
     };

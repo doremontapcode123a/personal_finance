@@ -33,4 +33,6 @@ public interface BudgetDao {
     // --- Lấy ngân sách theo danh mục con ---
     @Query("SELECT * FROM BUDGET WHERE SUB_CATEGORYid = :subCategoryId LIMIT 1")
     Budget getBudgetBySubCategoryId(int subCategoryId);
+    @Query("SELECT * FROM BUDGET WHERE USERid = :userId ORDER BY id ASC")
+    List<Budget> getAllBudgetsByUserId(int userId);
 }

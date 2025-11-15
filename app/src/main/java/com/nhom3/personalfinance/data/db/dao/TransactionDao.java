@@ -81,4 +81,6 @@ public interface TransactionDao {
     // --- Lấy 10 giao dịch gần nhất (bản khác) ---
     @Query("SELECT * FROM `TRANSACTION` WHERE USERid = :userId ORDER BY date DESC LIMIT 10")
     LiveData<List<Transaction>> getTop10RecentTransactions(int userId);
+    @Query("SELECT SUM(amount) FROM `TRANSACTION` WHERE SUB_CATEGORYid = :subCategoryId AND USERid = :userId AND date BETWEEN :startDate AND :endDate AND amount < 0")
+    double getSumOfExpenseForCategory(int subCategoryId, int userId, Date startDate, Date endDate);
 }

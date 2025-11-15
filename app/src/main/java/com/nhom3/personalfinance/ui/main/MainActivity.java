@@ -13,6 +13,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import com.nhom3.personalfinance.ui.main.BudgetFragment;
+// (Thay vì StatisticsFragment)
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -114,8 +116,10 @@ public class MainActivity extends AppCompatActivity {
                 selectedFragment = new HomeFragment();
             } else if (itemId == R.id.nav_transactions) {
                 selectedFragment = new TransactionListFragment();
-            } else if (itemId == R.id.nav_statistics) {
-                selectedFragment = new StatisticsFragment();
+            } else if (itemId == R.id.nav_budget) {
+                selectedFragment = new BudgetFragment();
+                // (Thay vì nav_statistics và StatisticsFragment)
+                // --- HẾT SỬA ---
             } else if (itemId == R.id.nav_account) {
                 selectedFragment = new AccountFragment();
             }

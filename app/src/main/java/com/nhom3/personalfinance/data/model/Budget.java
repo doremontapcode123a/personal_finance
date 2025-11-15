@@ -25,6 +25,7 @@ public class Budget {
 
     @ColumnInfo(name = "SUB_CATEGORYid")
     public int SUB_CATEGORYid;
+    public int USERid;
 
     // --- Constructor mặc định (Room yêu cầu) ---
     public Budget() {
