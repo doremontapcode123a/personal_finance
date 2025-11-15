@@ -24,7 +24,7 @@ public class RegisterActivity extends AppCompatActivity {
     private EditText edtUsername;
     private EditText edtPassword;
     private Button btnRegister;
-    private TextView tvLogin; // 🔥 KHAI BÁO MỚI CHO TEXTVIEW ĐĂNG NHẬP
+    private TextView tvLogin;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -35,13 +35,12 @@ public class RegisterActivity extends AppCompatActivity {
         UserDao userDao = AppDatabase.getDatabase(this).userDao();
         RegisterViewModelFactory factory = new RegisterViewModelFactory(userDao);
         viewModel = new ViewModelProvider(this, factory).get(RegisterViewModel.class);
-        // ----------------------------------------
 
         // --- Ánh xạ View ---
         edtUsername = findViewById(R.id.edtUsername);
         edtPassword = findViewById(R.id.edtPassword);
         btnRegister = findViewById(R.id.btnRegister);
-        tvLogin = findViewById(R.id.tvLogin); // 🔥 ÁNH XẠ TEXTVIEW CÓ ID tvLogin
+        tvLogin = findViewById(R.id.tvLogin);
 
         // --- Sự kiện đăng ký ---
         btnRegister.setOnClickListener(v -> performRegister());
@@ -51,7 +50,6 @@ public class RegisterActivity extends AppCompatActivity {
             // Tạo Intent để chuyển sang LoginActivity
             Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
             startActivity(intent);
-            // Gọi finish() để xóa RegisterActivity khỏi stack, khi nhấn back từ Login sẽ thoát
             finish();
         });
         // ------------------------------------------
@@ -67,7 +65,6 @@ public class RegisterActivity extends AppCompatActivity {
                 Toast.makeText(RegisterActivity.this, message, Toast.LENGTH_LONG).show();
 
                 // Kiểm tra xem đăng ký có thành công không
-                // Lưu ý: Dùng .startsWith() hoặc .equalsIgnoreCase().trim() để kiểm tra an toàn hơn
                 if (message.contains("Đăng ký thành công")) {
                     finish(); // Quay lại LoginActivity
                 }

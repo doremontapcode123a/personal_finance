@@ -19,10 +19,9 @@ import com.nhom3.personalfinance.viewmodel.LoginViewModelFactory;
 
 public class LoginActivity extends AppCompatActivity {
     private LoginViewModel viewModel;
-    // Khai báo các khóa và tên tệp SharedPreferences phải KHỚP với AccountFragment
     private static final String PREF_USER_ID = "current_user_id";
-    private static final String PREF_USERNAME_KEY = "LOGGED_IN_USER"; // Khóa USERNAME (Phải khớp)
-    private static final String PREF_FILE_NAME = "AppPrefs";          // Tên tệp SharedPreferences (Phải khớp)
+    private static final String PREF_USERNAME_KEY = "LOGGED_IN_USER";
+    private static final String PREF_FILE_NAME = "AppPrefs";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

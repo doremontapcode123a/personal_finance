@@ -17,19 +17,15 @@ public class AccountViewModel extends ViewModel {
 
     private final MutableLiveData<String> passwordChangeMessage = new MutableLiveData<>();
 
-    // 🔥 LIVE DATA BÁO HIỆU ĐIỀU HƯỚNG MỚI
     private final MutableLiveData<Boolean> navigateToWelcome = new MutableLiveData<>();
 
     private static final int MIN_PASSWORD_LENGTH = 6;
-    // Đã thay đổi: Biểu thức Regex mới chỉ cần kiểm tra tối thiểu 6 ký tự bất kỳ.
-    // "^.{6,}$" : Bắt đầu chuỗi, bất kỳ ký tự nào, lặp lại ít nhất 6 lần, kết thúc chuỗi.
     private static final Pattern PASSWORD_PATTERN = Pattern.compile("^.{6,}$");
 
     // Getters
     public LiveData<String> getPasswordChangeMessage() { return passwordChangeMessage; }
-    public LiveData<Boolean> getNavigateToWelcome() { return navigateToWelcome; } // 🔥 CẦN CÓ
+    public LiveData<Boolean> getNavigateToWelcome() { return navigateToWelcome; }
 
-    // ... (Constructor, Getters khác) ...
     public AccountViewModel(UserDao userDao, int currentUserId) {
         this.userDao = userDao;
         this.currentUserLiveData = userDao.getUserById(currentUserId);
@@ -49,12 +45,7 @@ public class AccountViewModel extends ViewModel {
             passwordChangeMessage.postValue("Mật khẩu phải dài ít nhất " + MIN_PASSWORD_LENGTH + " ký tự.");
             return false;
         }
-        // Chỉ cần kiểm tra độ dài tối thiểu 6 ký tự, không cần kiểm tra các yêu cầu phức tạp khác
         if (!PASSWORD_PATTERN.matcher(password).matches()) {
-            // Trường hợp này gần như không xảy ra do đã kiểm tra ở trên (password.length() < MIN_PASSWORD_LENGTH)
-            // nhưng giữ lại để tuân thủ logic. Thông báo này có thể xóa hoặc sửa thành thông báo chung.
-            // Nếu bạn muốn bỏ hẳn kiểm tra Regex phức tạp: có thể xóa khối if này.
-            // Tuy nhiên, với Regex đơn giản "^.{6,}$", nó vẫn đảm bảo độ dài.
             return true;
         }
         return true;
@@ -85,9 +76,7 @@ public class AccountViewModel extends ViewModel {
         });
     }
 
-    /**
-     * 🔥 PHƯƠNG THỨC MỚI: Gửi lệnh đăng xuất.
-     */
+    //đăng xuất.
     public void logoutUser() {
         navigateToWelcome.postValue(true);
     }
