@@ -1,47 +1,53 @@
 package com.nhom3.personalfinance.viewmodel;
 
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
+import android.app.Application;
+import android.os.Handler;
+import android.os.Looper;
+
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
+
+import com.nhom3.personalfinance.data.db.AppDatabase;
 import com.nhom3.personalfinance.data.db.dao.UserDao;
 import com.nhom3.personalfinance.data.model.User;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class LoginViewModel extends ViewModel {
+public class LoginViewModel extends AndroidViewModel {
 
+    private final ExecutorService executor;
+    private final Handler mainHandler;
     private final UserDao userDao;
-    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
-    private final MutableLiveData<User> currentUser = new MutableLiveData<>();
-    private final MutableLiveData<String> loginMessage = new MutableLiveData<>();
-
-    // Getters
-    public LiveData<User> getCurrentUser() { return currentUser; }
-    public LiveData<String> getLoginMessage() { return loginMessage; }
-
-    public LoginViewModel(UserDao userDao) {
-        this.userDao = userDao;
+    public interface AuthCallback {
+        void onResult(User user, String message);
     }
 
-    public void attemptLogin(String username, String passwordAttempt) {
-        executorService.execute(() -> {
-            User user = userDao.getUserByUsername(username);
+    public LoginViewModel(@NonNull Application application) {
+        super(application);
+        AppDatabase db = AppDatabase.getDatabase(application);
+        executor = Executors.newSingleThreadExecutor();
+        mainHandler = new Handler(Looper.getMainLooper());
 
-            // TODO: So sánh passwordAttempt (đã hash) với user.getPassword()
-            if (user != null && user.getPassword().equals(passwordAttempt)) {
-                currentUser.postValue(user);
-                loginMessage.postValue(null);
-            } else {
-                currentUser.postValue(null);
-                loginMessage.postValue("Tên đăng nhập hoặc mật khẩu không đúng.");
+        userDao = db.userDao();
+    }
+
+    /**
+     * Xử lý logic ĐĂNG NHẬP.
+     */
+    public void login(String username, String password, AuthCallback callback) {
+        executor.execute(() -> {
+            try {
+                User user = userDao.getUserByUsernameAndPassword(username, password);
+                if (user != null) {
+                    mainHandler.post(() -> callback.onResult(user, "Đăng nhập thành công!"));
+                } else {
+                    mainHandler.post(() -> callback.onResult(null, "Sai tên đăng nhập hoặc mật khẩu!"));
+                }
+            } catch (Exception e) {
+                mainHandler.post(() -> callback.onResult(null, "Lỗi: " + e.getMessage()));
             }
         });
-    }
-
-    @Override
-    protected void onCleared() {
-        super.onCleared();
-        executorService.shutdown();
     }
 }

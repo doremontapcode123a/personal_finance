@@ -18,7 +18,7 @@ public class ChangePasswordActivity extends AppCompatActivity {
     private AccountViewModel viewModel;
 
     private static final String PREF_NAME = "AppPrefs";
-    private static final String PREF_USER_ID = "current_user_id";
+    private static final String PREF_USER_ID = "LOGGED_IN_USER_ID";
 
     private EditText currentPasswordInput, newPasswordInput, confirmPasswordInput;
     private Button saveButton;
@@ -28,7 +28,9 @@ public class ChangePasswordActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_change_password);
 
+        // Lấy ID người dùng đã đăng nhập. Nếu không tìm thấy, mặc định là -1.
         int currentUserId = getSharedPreferences(PREF_NAME, MODE_PRIVATE).getInt(PREF_USER_ID, -1);
+
         if (currentUserId == -1) {
             Toast.makeText(this, "Lỗi: Phiên đăng nhập không hợp lệ.", Toast.LENGTH_SHORT).show();
             finish();
@@ -36,6 +38,7 @@ public class ChangePasswordActivity extends AppCompatActivity {
         }
 
         UserDao userDao = AppDatabase.getDatabase(this).userDao();
+        // Khởi tạo Factory và ViewModel bằng ID người dùng hợp lệ
         AccountViewModelFactory factory = new AccountViewModelFactory(userDao, currentUserId);
         viewModel = new ViewModelProvider(this, factory).get(AccountViewModel.class);
 
@@ -45,9 +48,9 @@ public class ChangePasswordActivity extends AppCompatActivity {
         saveButton = findViewById(R.id.button_save_password);
 
 
-        saveButton.setEnabled(true);
+        saveButton.setEnabled(false); // Vô hiệu hóa cho đến khi dữ liệu người dùng được tải
 
-        //  1. Observer để kích hoạt nút sau khi dữ liệu tải
+        //  1. Observer để kích hoạt nút sau khi dữ liệu tải thành công
         viewModel.getCurrentUser().observe(this, new Observer<User>() {
             @Override
             public void onChanged(User user) {
@@ -58,7 +61,7 @@ public class ChangePasswordActivity extends AppCompatActivity {
             }
         });
 
-        //  2. Observer để nhận thông báo kết quả (validation, lỗi cũ sai, thành công)
+        //  2. Observer để nhận thông báo kết quả
         viewModel.getPasswordChangeMessage().observe(this, message -> {
             if (message != null && !message.isEmpty()) {
                 Toast.makeText(this, message, Toast.LENGTH_LONG).show();
@@ -91,6 +94,4 @@ public class ChangePasswordActivity extends AppCompatActivity {
             viewModel.validateAndChangePassword(currentPass, newPass);
         });
     }
-
-
 }

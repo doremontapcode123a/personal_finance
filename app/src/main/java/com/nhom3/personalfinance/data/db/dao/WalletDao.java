@@ -27,8 +27,8 @@ public interface WalletDao {
     void deleteWallet(Wallet wallet);
 
     // --- Lấy tất cả ví ---
-    @Query("SELECT * FROM WALLET ORDER BY id ASC")
-    List<Wallet> getAllWallets();
+    @Query("SELECT * FROM WALLET WHERE USERid = :userId ORDER BY id ASC")
+    List<Wallet> getAllWalletsOfUser(int userId);
 
     // --- Lấy ví theo ID ---
     @Query("SELECT * FROM WALLET WHERE id = :walletId LIMIT 1")

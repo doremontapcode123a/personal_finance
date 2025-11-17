@@ -1,98 +1,138 @@
 package com.nhom3.personalfinance.viewmodel;
 
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
+import android.app.Application;
+import android.os.Handler;
+import android.os.Looper;
 
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
+
+import com.nhom3.personalfinance.data.db.AppDatabase;
+import com.nhom3.personalfinance.data.db.dao.CategoryDao;
 import com.nhom3.personalfinance.data.db.dao.UserDao;
+import com.nhom3.personalfinance.data.db.dao.WalletDao;
+import com.nhom3.personalfinance.data.model.Category;
+import com.nhom3.personalfinance.data.model.SubCategory;
 import com.nhom3.personalfinance.data.model.User;
+import com.nhom3.personalfinance.data.model.Wallet;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class RegisterViewModel extends ViewModel {
+// ViewModel chỉ xử lý logic ĐĂNG KÝ và khởi tạo dữ liệu mẫu
+public class RegisterViewModel extends AndroidViewModel {
 
+    private final ExecutorService executor;
+    private final Handler mainHandler;
     private final UserDao userDao;
-    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
-
-    private final MutableLiveData<String> registrationMessage = new MutableLiveData<>();
-    private final MutableLiveData<Boolean> isRegistrationComplete = new MutableLiveData<>();
-
-    private static final int MIN_PASSWORD_LENGTH = 8;
-
+    private final WalletDao walletDao;
+    private final CategoryDao categoryDao;
     private static final Pattern PASSWORD_PATTERN =
-            Pattern.compile("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$");
+            Pattern.compile("^(?=.*[0-9])(?=.*[a-zA-Z]).{8,}$");
 
-    public LiveData<String> getRegistrationMessage() {
-        return registrationMessage;
+    public interface AuthCallback {
+        void onResult(User user, String message);
     }
 
-    public RegisterViewModel(UserDao userDao) {
-        this.userDao = userDao;
+    public RegisterViewModel(@NonNull Application application) {
+        super(application);
+        AppDatabase db = AppDatabase.getDatabase(application);
+        executor = Executors.newSingleThreadExecutor();
+        mainHandler = new Handler(Looper.getMainLooper());
+
+        userDao = db.userDao();
+        walletDao = db.walletDao();
+        categoryDao = db.categoryDao();
     }
 
-    private boolean isValidPassword(String password) {
-        if (password == null || password.isEmpty()) {
-            registrationMessage.postValue("Mật khẩu không được để trống.");
-            return false;
-        }
-        if (password.length() < MIN_PASSWORD_LENGTH) {
-            registrationMessage.postValue("Mật khẩu phải dài ít nhất " + MIN_PASSWORD_LENGTH + " ký tự.");
-            return false;
-        }
-        if (!PASSWORD_PATTERN.matcher(password).matches()) {
-            registrationMessage.postValue("Mật khẩu phải có ít nhất 1 chữ và 1 số.");
-            return false;
-        }
-        return true;
+    private boolean isPasswordValid(String password) {
+        Matcher matcher = PASSWORD_PATTERN.matcher(password);
+        return matcher.matches();
     }
 
-    public void register(String username, String password) {
-        registrationMessage.postValue(null);
-        isRegistrationComplete.postValue(false);
+    /**
+     * Xử lý logic ĐĂNG KÝ.
+     */
+    public void register(String username, String password, AuthCallback callback) {
+        executor.execute(() -> {
+            // --- BƯỚC 1: KIỂM TRA MẬT KHẨU ---
+            if (!isPasswordValid(password)) {
+                mainHandler.post(() -> callback.onResult(null, "Mật khẩu phải dài tối thiểu 8 ký tự, bao gồm cả chữ và số."));
+                return;
+            }
 
-        // --- Validate Username ---
-        if (username == null || username.trim().isEmpty()) {
-            registrationMessage.postValue("Tên đăng nhập không được để trống.");
-            return;
-        }
-
-        // --- Validate Password ---
-        if (!isValidPassword(password)) {
-            return;
-        }
-
-        executorService.execute(() -> {
             try {
-                // TODO: HASH mật khẩu trước khi lưu
-                String hashedPassword = password;
-
-                // Kiểm tra xem username đã tồn tại chưa
-                if (userDao.getUserByUsername(username) != null) {
-                    registrationMessage.postValue("Tên đăng nhập đã tồn tại. Vui lòng chọn tên khác.");
-                    return;
-                }
-
-                User newUser = new User(username, hashedPassword);
-                long result = userDao.insertUser(newUser);
-
-                if (result > 0) {
-                    registrationMessage.postValue("Đăng ký thành công!");
-                    isRegistrationComplete.postValue(true);
+                // --- BƯỚC 2: KIỂM TRA USERNAME ĐÃ TỒN TẠI ---
+                User existingUser = userDao.getUserByUsername(username);
+                if (existingUser != null) {
+                    mainHandler.post(() -> callback.onResult(null, "Username đã tồn tại"));
                 } else {
-                    registrationMessage.postValue("Đăng ký thất bại: Không thể chèn vào CSDL.");
-                }
 
+                    // --- BƯỚC 3: TẠO USER VÀ DỮ LIỆU MẪU ---
+                    User newUser = new User(username, password);
+                    userDao.insertUser(newUser);
+
+                    User createdUser = userDao.getUserByUsername(username);
+
+                    if (createdUser != null) {
+                        ensureParentCategoriesExist();
+                        createDefaultDataForUser(createdUser.id); // 3. TẠO DỮ LIỆU MẪU (Ví và Nhóm)
+
+                        mainHandler.post(() -> callback.onResult(createdUser, "Đăng ký thành công"));
+                    } else {
+                        mainHandler.post(() -> callback.onResult(null, "Lỗi tạo user"));
+                    }
+                }
             } catch (Exception e) {
-                registrationMessage.postValue("Đăng ký thất bại do lỗi hệ thống.");
+                e.printStackTrace();
+                mainHandler.post(() -> callback.onResult(null, "Lỗi: " + e.getMessage()));
             }
         });
     }
 
-    @Override
-    protected void onCleared() {
-        super.onCleared();
-        executorService.shutdown();
+    private void ensureParentCategoriesExist() {
+        try {
+            Category thu = new Category(); thu.id = 1; thu.name = "Thu";
+            categoryDao.insertCategory(thu);
+
+            Category chi = new Category(); chi.id = 2; chi.name = "Chi";
+            categoryDao.insertCategory(chi);
+        } catch (Exception e) {
+        }
+    }
+
+    // Tạo Ví và Nhóm mẫu cho User
+    private void createDefaultDataForUser(int userId) {
+        try {
+            // A. Tạo 1 Ví tiền mặt (0đ)
+            Wallet wallet = new Wallet();
+            wallet.name = "Tiền mặt";
+            wallet.balance = 0;
+            wallet.USERid = userId;
+            walletDao.insertWallet(wallet);
+
+            // B. Tạo Nhóm mẫu cho THU (Category ID = 1)
+            createSubCat("Lương", 1, userId);
+            createSubCat("Thưởng", 1, userId);
+
+            // C. Tạo Nhóm mẫu cho CHI (Category ID = 2)
+            createSubCat("Ăn uống", 2, userId);
+            createSubCat("Đi lại", 2, userId);
+            createSubCat("Mua sắm", 2, userId);
+            createSubCat("Sinh hoạt", 2, userId);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void createSubCat(String name, int parentId, int userId) {
+        SubCategory sub = new SubCategory();
+        sub.name = name;
+        sub.CATEGORYid = parentId;
+        sub.USERid = userId;
+        categoryDao.insertSubCategory(sub);
     }
 }
