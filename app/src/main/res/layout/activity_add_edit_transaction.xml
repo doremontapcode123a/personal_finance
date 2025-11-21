@@ -50,9 +50,20 @@
             <com.google.android.material.tabs.TabLayout
                 android:id="@+id/tab_layout_type"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:layout_height="wrap_content"
                 app:tabGravity="fill"
-                app:tabMode="fixed" />
+                app:tabMode="fixed">
+
+                <com.google.android.material.tabs.TabItem
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Khoản chi" />
+
+                <com.google.android.material.tabs.TabItem
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Khoản thu" />
+            </com.google.android.material.tabs.TabLayout>
 
             <TextView
                 android:layout_width="wrap_content"
