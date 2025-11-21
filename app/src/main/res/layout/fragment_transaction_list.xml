@@ -7,90 +7,137 @@
     android:orientation="vertical"
     tools:context=".ui.main.TransactionListFragment">
 
-    <TextView
-        android:id="@+id/text_view_total_balance"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingTop="24dp"
+        android:paddingBottom="16dp"
+        android:paddingHorizontal="16dp"
+        android:background="?attr/colorPrimary"
+        android:backgroundTint="#1976D2">
+        <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
-        android:paddingTop="16dp"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        tools:text="10,500,000 ₫" />
+        android:text="Số dư tổng"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        android:layout_marginBottom="4dp"
+        />
 
-    <TextView
+        <TextView
+            android:id="@+id/text_view_total_balance"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:textColor="@android:color/white"
+            android:textSize="32sp"
+            android:textStyle="bold"
+            tools:text="10,500,000 ₫" />
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp"
+        android:background="@color/material_grey_100"> <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="16dp"
         android:text="Tra soát giao dịch"
+        android:textColor="?android:attr/textColorSecondary"
         android:textSize="14sp"
         android:layout_marginBottom="8dp"/>
 
-    <com.google.android.material.chip.ChipGroup
-        android:id="@+id/chip_group_date_filter"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingHorizontal="16dp"
-        app:singleSelection="true">
-
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chip_date_last_month"
-            style="@style/Widget.MaterialComponents.Chip.Filter"
-            android:layout_width="wrap_content"
+        <HorizontalScrollView
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Tháng trước" />
+            android:scrollbars="none"
+            android:paddingHorizontal="16dp"
+            android:clipToPadding="false">
 
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chip_date_this_month"
-            style="@style/Widget.MaterialComponents.Chip.Filter"
-            android:layout_width="wrap_content"
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chip_group_date_filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:singleSelection="true">
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_date_this_month"
+                    style="@style/Widget.MaterialComponents.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tháng này"
+                    android:checked="true"
+                    app:chipBackgroundColor="?attr/colorSecondary"
+                    android:textColor="@android:color/white"
+                    app:chipStrokeWidth="0dp"/>
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_date_last_month"
+                    style="@style/Widget.MaterialComponents.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tháng trước" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_date_custom"
+                    style="@style/Widget.MaterialComponents.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tùy chọn" /> </com.google.android.material.chip.ChipGroup>
+        </HorizontalScrollView>
+
+        <HorizontalScrollView
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Tháng này"
-            android:checked="true" /> <com.google.android.material.chip.Chip
-        android:id="@+id/chip_date_custom"
-        style="@style/Widget.MaterialComponents.Chip.Filter"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Tùy chọn" />
-    </com.google.android.material.chip.ChipGroup>
+            android:scrollbars="none"
+            android:paddingHorizontal="16dp"
+            android:layout_marginTop="8dp"
+            android:clipToPadding="false">
 
-    <com.google.android.material.chip.ChipGroup
-        android:id="@+id/chip_group_type_filter"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingHorizontal="16dp"
-        app:singleSelection="true">
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chip_group_type_filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:singleSelection="true">
 
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chip_type_all"
-            style="@style/Widget.MaterialComponents.Chip.Filter"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Tất cả"
-            android:checked="true" /> <com.google.android.material.chip.Chip
-        android:id="@+id/chip_type_income"
-        style="@style/Widget.MaterialComponents.Chip.Filter"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Khoản thu" />
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_type_all"
+                    style="@style/Widget.MaterialComponents.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tất cả"
+                    android:checked="true"
+                    app:chipBackgroundColor="?attr/colorSecondary"
+                    android:textColor="@android:color/white"
+                    app:chipStrokeWidth="0dp" />
 
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chip_type_expense"
-            style="@style/Widget.MaterialComponents.Chip.Filter"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Khoản chi" />
-    </com.google.android.material.chip.ChipGroup>
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_type_income"
+                    style="@style/Widget.MaterialComponents.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Khoản thu" />
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="?android:attr/listDivider"
-        android:layout_marginVertical="8dp"/>
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_type_expense"
+                    style="@style/Widget.MaterialComponents.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Khoản chi" />
+            </com.google.android.material.chip.ChipGroup>
+        </HorizontalScrollView>
+    </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view_transactions"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:paddingTop="8dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:listitem="@layout/item_transaction" />
 

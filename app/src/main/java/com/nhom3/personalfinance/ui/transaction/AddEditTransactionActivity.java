@@ -10,6 +10,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar; // Đã thêm import
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.tabs.TabLayout;
@@ -30,6 +31,7 @@ public class AddEditTransactionActivity extends AppCompatActivity {
 
     private TransactionViewModel viewModel;
 
+    private Toolbar toolbar; // Đã thêm biến Toolbar
     private TabLayout tabLayoutType;
     private Spinner spinnerWallet;
     private Spinner spinnerCategory;
@@ -50,7 +52,6 @@ public class AddEditTransactionActivity extends AppCompatActivity {
     private Calendar selectedDate = Calendar.getInstance();
     private SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
 
-    // Biến cờ, 0 = Chi, 1 = Thu
     private int selectedType = 0; // Mặc định là "Khoản chi"
 
     @Override
@@ -58,26 +59,19 @@ public class AddEditTransactionActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_edit_transaction);
 
-        // Khởi tạo ViewModel
         viewModel = new ViewModelProvider(this).get(TransactionViewModel.class);
 
-        // Ánh xạ View
         findViews();
-
-        // Cài đặt Adapter cho các Spinner
         setupAdapters();
-
-        // Lắng nghe dữ liệu từ ViewModel
         observeViewModel();
-
-        // Cài đặt sự kiện
         setupListeners();
-
-        // Cập nhật ngày mặc định
         updateDateLabel();
     }
 
     private void findViews() {
+        // ÁNH XẠ TOOLBAR
+        toolbar = findViewById(R.id.toolbar); // Cần đảm bảo ID này tồn tại trong XML
+
         tabLayoutType = findViewById(R.id.tab_layout_type);
         spinnerWallet = findViewById(R.id.spinner_wallet);
         spinnerCategory = findViewById(R.id.spinner_category);
@@ -89,54 +83,58 @@ public class AddEditTransactionActivity extends AppCompatActivity {
     }
 
     private void setupAdapters() {
-        // Adapter cho Ví
         walletAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, walletList);
         walletAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerWallet.setAdapter(walletAdapter);
 
-        // Adapter cho Nhóm Thu
         incomeCategoryAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, incomeCategoryList);
         incomeCategoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-        // Adapter cho Nhóm Chi
         expenseCategoryAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, expenseCategoryList);
         expenseCategoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-        // Mặc định hiển thị adapter Khoản Chi
         spinnerCategory.setAdapter(expenseCategoryAdapter);
     }
 
     private void observeViewModel() {
-        // Lấy danh sách Ví
         viewModel.getAllWallets().observe(this, wallets -> {
             walletList.clear();
             walletList.addAll(wallets);
             walletAdapter.notifyDataSetChanged();
         });
 
-        // Lấy danh sách Nhóm Thu
         viewModel.getIncomeCategories().observe(this, subCategories -> {
             incomeCategoryList.clear();
             incomeCategoryList.addAll(subCategories);
-            // Cập nhật adapter nếu đang ở tab Thu
             if (selectedType == 1) {
                 incomeCategoryAdapter.notifyDataSetChanged();
             }
         });
 
-        // Lấy danh sách Nhóm Chi
         viewModel.getExpenseCategories().observe(this, subCategories -> {
             expenseCategoryList.clear();
             expenseCategoryList.addAll(subCategories);
-            // Cập nhật adapter nếu đang ở tab Chi
             if (selectedType == 0) {
                 expenseCategoryAdapter.notifyDataSetChanged();
-//                spinnerCategory.setAdapter(expenseCategoryAdapter);
             }
         });
     }
 
     private void setupListeners() {
+
+        // --- BỔ SUNG CHỨC NĂNG NÚT ĐÓNG/QUAY LẠI TRÊN TOOLBAR ---
+        setSupportActionBar(toolbar);
+        // Hiển thị icon quay lại
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        // Tắt tiêu đề mặc định nếu đã dùng TextView custom trong Toolbar
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+        // Sự kiện nhấn icon quay lại
+        toolbar.setNavigationOnClickListener(v -> {
+            finish(); // Đóng Activity và quay về màn hình trước đó
+        });
+        // -----------------------------------------------------------
+
         // Sự kiện chọn Tab Thu/Chi
         tabLayoutType.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -183,17 +181,11 @@ public class AddEditTransactionActivity extends AppCompatActivity {
         String name = editTextName.getText().toString();
 
         // --- Validate dữ liệu ---
-        if (amountStr.isEmpty()) {
-            Toast.makeText(this, "Vui lòng nhập số tiền", Toast.LENGTH_SHORT).show();
+        if (amountStr.isEmpty() || name.isEmpty()) {
+            Toast.makeText(this, "Vui lòng nhập đầy đủ Số tiền và Tên giao dịch", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        if (name.isEmpty()) {
-            Toast.makeText(this, "Vui lòng nhập tên giao dịch", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        // LỖI 1: BẠN BỊ THIẾU CÁC DÒNG LẤY DỮ LIỆU TỪ SPINNER
         Wallet selectedWallet = (Wallet) spinnerWallet.getSelectedItem();
         SubCategory selectedSubCategory = (SubCategory) spinnerCategory.getSelectedItem();
 
@@ -201,7 +193,6 @@ public class AddEditTransactionActivity extends AppCompatActivity {
             Toast.makeText(this, "Vui lòng chọn ví và nhóm", Toast.LENGTH_SHORT).show();
             return;
         }
-        // KẾT THÚC SỬA LỖI 1
 
         // --- Xử lý dữ liệu ---
         double amount = Double.parseDouble(amountStr);
@@ -210,26 +201,20 @@ public class AddEditTransactionActivity extends AppCompatActivity {
         }
 
         String note = editTextNote.getText().toString();
-
-        // LỖI 2: SỬA LẠI KIỂU DỮ LIỆU DATE
-        // File Transaction.java của bạn cần kiểu Date, không phải long
         java.util.Date date = selectedDate.getTime();
-        // KẾT THÚC SỬA LỖI 2
 
         // --- Tạo đối tượng Transaction ---
         Transaction newTransaction = new Transaction();
         newTransaction.amount = amount;
         newTransaction.name = name;
         newTransaction.note = note;
-        newTransaction.date = date; // <-- Đã sửa
+        newTransaction.date = date;
 
-        // Lấy ID từ các object đã chọn ở trên
         newTransaction.WALLETid = selectedWallet.id;
         newTransaction.SUB_CATEGORYid = selectedSubCategory.id;
 
         // --- Gọi ViewModel để lưu ---
-        // Truyền object "selectedWallet" vào (code cũ của bạn bị thiếu)
-        viewModel.insertTransaction(newTransaction, selectedWallet);
+        viewModel.insertTransaction(newTransaction, selectedWallet); // Truyền object selectedWallet vào
 
         Toast.makeText(this, "Đã lưu giao dịch!", Toast.LENGTH_SHORT).show();
         finish(); // Đóng Activity sau khi lưu

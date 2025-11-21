@@ -1,33 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="16dp">
+    android:orientation="horizontal"
+    android:paddingVertical="12dp"
+    android:paddingHorizontal="16dp"
+    android:background="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true"
+    android:gravity="center_vertical">
 
-    <TextView
-        android:id="@+id/text_view_transaction_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Tên Giao Dịch (Ăn trưa)"
-        android:textSize="16sp"
-        android:textStyle="bold" />
+    <ImageView
+        android:id="@+id/image_view_category_icon"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginEnd="16dp"
+        android:padding="6dp"
+        app:srcCompat="@drawable/ic_coin_24"
+        tools:ignore="ContentDescription"
+        tools:src="@drawable/ic_coin_24"
+        android:background="@drawable/circular_background_light"
+        tools:background="@drawable/circular_background_light" />
 
-    <TextView
-        android:id="@+id/text_view_transaction_date"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="13/11/2025"
-        android:textSize="14sp"
-        android:layout_below="@id/text_view_transaction_name" />
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/text_view_transaction_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="?android:attr/textColorPrimary"
+            tools:text="Ăn trưa &amp; Nước uống" />
+
+        <TextView
+            android:id="@+id/text_view_transaction_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="13sp"
+            android:textColor="?android:attr/textColorSecondary"
+            android:layout_marginTop="2dp"
+            tools:text="13/11/2025 - Tiền mặt" />
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/text_view_transaction_amount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="-50,000 đ"
-        android:textSize="16sp"
+        android:layout_marginStart="8dp"
+        android:textSize="17sp"
         android:textStyle="bold"
-        android:layout_alignParentEnd="true"
-        android:layout_centerVertical="true" />
+        android:textColor="@color/expense_color"
+        tools:text="-50,000 ₫"
+        tools:textColor="@color/expense_color" />
 
-</RelativeLayout>
+</LinearLayout>

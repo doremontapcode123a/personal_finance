@@ -5,111 +5,161 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp"
+    android:fitsSystemWindows="true"
     tools:context=".ui.transaction.AddEditTransactionActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Thêm giao dịch"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="16dp" />
-
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tab_layout_type"
+    <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:tabGravity="fill"
-        app:tabMode="fixed">
+        android:layout_height="wrap_content">
 
-        <com.google.android.material.tabs.TabItem
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            android:backgroundTint="#1976D2"> <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Khoản chi" />
+            android:text="Thêm Giao Dịch"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+            android:layout_gravity="center_horizontal" />
+            <ImageButton
+                android:id="@+id/button_close"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:background="@android:color/transparent"
+                android:contentDescription="Đóng"/></androidx.appcompat.widget.Toolbar>
+    </com.google.android.material.appbar.AppBarLayout>
 
-        <com.google.android.material.tabs.TabItem
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Khoản thu" />
-    </com.google.android.material.tabs.TabLayout>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Chọn ví"
-        android:layout_marginTop="16dp" />
-    <Spinner
-        android:id="@+id/spinner_wallet"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="48dp" />
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Chọn nhóm"
-        android:layout_marginTop="8dp" />
-    <Spinner
-        android:id="@+id/spinner_category"
-        android:layout_width="match_parent"
-        android:layout_height="48dp" />
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:hint="Số tiền">
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/edit_text_amount"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="numberDecimal" />
-    </com.google.android.material.textfield.TextInputLayout>
+            android:orientation="vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="24dp">
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:hint="Tên (VD: Ăn trưa, Lương tháng 5)">
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/edit_text_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textCapSentences" />
-    </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/tab_layout_type"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                app:tabGravity="fill"
+                app:tabMode="fixed" />
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:hint="Ghi chú (phụ)">
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/edit_text_note"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="text" />
-    </com.google.android.material.textfield.TextInputLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Chọn ví"
+                android:textColor="?android:attr/textColorSecondary"/>
+            <Spinner
+                android:id="@+id/spinner_wallet"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/abc_spinner_mtrl_am_alpha"
+                android:layout_marginBottom="16dp" />
 
-    <TextView
-        android:id="@+id/text_view_date"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:gravity="center_vertical"
-        android:layout_marginTop="8dp"
-        android:text="Hôm nay"
-        android:textSize="16sp"
-        android:background="?attr/selectableItemBackground"
-        android:clickable="true"
-        android:focusable="true"
-        android:paddingStart="4dp"
-        android:paddingEnd="4dp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Chọn nhóm"
+                android:textColor="?android:attr/textColorSecondary"/>
+            <Spinner
+                android:id="@+id/spinner_category"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/abc_spinner_mtrl_am_alpha"
+                android:layout_marginBottom="16dp" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="12dp"
+                android:hint="Số tiền"
+                >
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edit_text_amount"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:hint="Tên (VD: Ăn trưa, Lương tháng 5)">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edit_text_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textCapSentences" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:hint="Ghi chú (phụ)">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edit_text_note"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textMultiLine"
+                    android:maxLines="3" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ngày giao dịch"
+                android:layout_marginTop="8dp"
+                android:textColor="?android:attr/textColorSecondary"/>
+            <TextView
+                android:id="@+id/text_view_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:gravity="center_vertical"
+                android:paddingStart="4dp"
+                android:paddingEnd="4dp"
+                android:drawablePadding="16dp"
+                android:text="Hôm nay"
+                android:textSize="16sp"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                tools:text="Hôm nay, 21/11/2025"/>
+
+        </LinearLayout>
+    </ScrollView>
 
     <Button
         android:id="@+id/button_save"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Lưu"
-        android:layout_marginTop="24dp" />
+        android:text="LƯU GIAO DỊCH"
+        android:backgroundTint="#1976D2"
+        android:textColor="@android:color/white"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp"
+        android:textSize="18sp"/>
 
 </LinearLayout>

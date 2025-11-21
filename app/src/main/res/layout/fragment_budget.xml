@@ -5,61 +5,105 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    tools:context=".ui.main.BudgetFragment">
+    android:background="#F0F2F5" tools:context=".ui.main.BudgetFragment">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Ngân sách (Tháng này)"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:layout_gravity="center_horizontal"
-        android:padding="16dp" />
-
-    <LinearLayout
+    <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingHorizontal="16dp"
-        android:layout_marginBottom="8dp">
+        android:layout_height="wrap_content">
 
-        <TextView
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            android:backgroundTint="#1976D2"> <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Chọn nhóm chi" />
-        <Spinner
-            android:id="@+id/spinner_budget_category"
-            android:layout_width="match_parent"
-            android:layout_height="48dp" />
+            android:text="Ngân sách (Tháng này)"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+            android:layout_gravity="center_horizontal" />
 
-        <com.google.android.material.textfield.TextInputLayout
+        </androidx.appcompat.widget.Toolbar>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginVertical="12dp"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="2dp">
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Số tiền (VD: 2000000)">
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/edit_text_budget_amount"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="numberDecimal" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:text="Thiết lập ngân sách mới"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp"/>
 
-        <Button
-            android:id="@+id/button_add_budget"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Thiết lập ngân sách"
-            android:layout_marginTop="8dp"/>
-    </LinearLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Chọn nhóm chi"
+                android:textColor="?android:attr/textColorSecondary"/>
+            <Spinner
+                android:id="@+id/spinner_budget_category"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/abc_spinner_mtrl_am_alpha"
+                android:layout_marginBottom="12dp" />
 
-    <View
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Số tiền (VD: 2.000.000)">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edit_text_budget_amount"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal"
+                    android:textSize="18sp"
+                    android:textStyle="bold"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <Button
+                android:id="@+id/button_add_budget"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="THIẾT LẬP NGÂN SÁCH"
+                android:layout_marginTop="16dp"
+                android:backgroundTint="#1976D2"
+                android:textColor="@android:color/white"
+                style="@style/Widget.MaterialComponents.Button.UnelevatedButton"/>
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <TextView
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="?android:attr/listDivider" />
+        android:layout_height="wrap_content"
+        android:text="Danh sách Ngân sách đã thiết lập"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="?android:attr/textColorPrimary"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view_budgets"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:paddingHorizontal="8dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:listitem="@layout/item_budget" />
 

@@ -19,7 +19,8 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
-            app:title="Báo cáo Thu - Chi" />
+            app:title="Báo cáo Thu - Chi"
+            android:backgroundTint="#1976D2"/>
 
     </com.google.android.material.appbar.AppBarLayout>
 

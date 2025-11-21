@@ -55,8 +55,8 @@ public class HomeFragment extends Fragment {
 
         // --- Ánh xạ Views ---
         tvTotalBalance = view.findViewById(R.id.tvSoDu); // ID TextView trong CardView
-        tvTotalIncome = view.findViewById(R.id.btnTongThu); // Thay 'tvThuNhap' bằng ID đúng trong layout của bạn
-        tvTotalExpense = view.findViewById(R.id.btnTongChi);
+        tvTotalIncome = view.findViewById(R.id.tvTongThu); // Thay 'tvThuNhap' bằng ID đúng trong layout của bạn
+        tvTotalExpense = view.findViewById(R.id.tvTongChi);
         transactionListView = view.findViewById(R.id.transactionList); // ID RecyclerView
         Button btnXemBaoCao = view.findViewById(R.id.btnXemBaoCao);
         Button btnXemTatCa = view.findViewById(R.id.btnXemTatCa);
